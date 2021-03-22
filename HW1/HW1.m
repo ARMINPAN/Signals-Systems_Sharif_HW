@@ -3,19 +3,23 @@
 % functions are defined at the end of the code
 %%
 % Ques.1.1 and 1.2
-% 1.1
 % Wireworld - 2d_fourColor_Cellular Automation 
 % 0 - > empty , 1 - > conductor , 2 - > electron head , 3 - > electron tail
 % empty : white ,conductor : green, electron head : purple , electron tail : red 
 % I have defined a function which user can choose size of the table and
 % and number of generations
-WireWorld(20,200);
+WireWorld(20,50);
 
 %%
-% Ques.2.1
+% Ques.2.1 
 % We want to calculate the Z transform of the x[n] given below
 Z_Transform();
-%%
+%% 
+% Ques.2.2
+% Inverse Z transform
+
+
+
 %% all the functions
 %Question 1
 function WireWorld(size, gens)
@@ -30,15 +34,31 @@ function WireWorld(size, gens)
     %CurrentCells below and comment Input function
     CurrentCells = Input(CurrentCells);
     
-    pause(0.01)
+    
+    % the periodic test case given in homework
+    % if you don`t want to watch just this periodic behaviour, comment the line below and 
+    % line 56 to 58 and line 127
+    %, this periodic behavior is just for the one in the homework_1
+    % which enter a electron head from the left after each 4 moves
+    countDown = 1; % for setting the period
+
+    
+    pause(0.1)
     
     while gens > 0
         if sum(CurrentCells) == 0	% all cells are empty
 			break;
         end
+        
+
         for x=1:1:size
             for y=1:1:size
                 if(CurrentCells(x, y) ~= 0)
+                    %just for periodic test case in the homework - comment 2lines below for
+                    %other inputs, we put a ElecHead in to the start
+                    if(mod(countDown,5) == 0 && CurrentCells(1,y) == 1)
+                        nextStepCells(1,y) = 2;
+                    end
                     if CurrentCells(x, y) == 2 	% electron head to electron tail
                         nextStepCells(x, y) = 3;
                     end
@@ -67,19 +87,19 @@ function WireWorld(size, gens)
                                         if (CurrentCells(x+k, y+j) == 2)
                                             counter = counter + 1;
                                         end  
-                                    elseif(x == 1 && k > -1)
+                                    elseif(y ~= 1 && y~= size && x == 1 && k > -1)
                                         if (CurrentCells(x+k, y+j) == 2)
                                             counter = counter + 1;
                                         end  
-                                    elseif(y == 1 && j > -1)
+                                    elseif(x ~= 1 && x~= size && y == 1 && j > -1)
                                         if (CurrentCells(x+k, y+j) == 2)
                                             counter = counter + 1;
                                         end  
-                                     elseif(x == size && k < 1)
+                                     elseif(y ~= 1 && y~= size && x == size && k < 1)
                                         if (CurrentCells(x+k, y+j) == 2)
                                             counter = counter + 1;
                                         end
-                                     elseif(y == size && j < 1)
+                                     elseif(x ~= 1 && x~= size && y == size && j < 1)
                                         if (CurrentCells(x+k, y+j) == 2)
                                             counter = counter + 1;
                                         end   
@@ -104,7 +124,9 @@ function WireWorld(size, gens)
 		title(strcat('Generation ', num2str(gensMemory-gens+1)))
 		CurrentCells =  nextStepCells;
         nextStepCells = zeros(size, size);
-		pause(0.01)
+        % just for Periodic test case - comment it otherwise
+        countDown = countDown + 1;
+		pause(0.1)
 		gens = gens - 1;
     end
 end
@@ -169,7 +191,7 @@ poles1 = solve(denominator1 == 0);
 
 subplot(1,3,1);
 zplane(zeros1, poles1); % zero-pole plot for X(z)
-title('X(z)');
+title('X(z)','interpreter','latex');
 
 
 % part 2 - Question 2.1
@@ -181,11 +203,12 @@ poles2 = solve(denominator2 == 0);
 
 subplot(1,3,2);
 zplane(zeros2, poles2); % zero-pole plot for X(2z)
-title('X(2z)');
+title('X(2z)','interpreter','latex');
 
 % inverse z transform for X2
 xinverse1(n) = iztrans(X2);
-
+% change syms function to a numerical function
+xinv1_func = double(xinverse1(0:40));
 
 % part 3 - Question 2.1
 X3 = X(z^3);% X(z^3)
@@ -196,23 +219,24 @@ poles3 = solve(denominator3 == 0);
 
 
 subplot(1,3,3);
-zplane(zeros3(3:6), poles3); % zero-pole plot for X(z^3)
-title('X(z^3)');
-%I have just used zeros(3:6) because ine the numerator of X3 there is a z^3
-%and z^3 = 0 would put three zeros in out vector and this cause errors if
-%we use zeros3(1:6) while plotting zeros
+zplane(double(zeros3), poles3); % zero-pole plot for X(z^3)
+title('X(z power 3)','interpreter','latex');
+
 
 % inverse z transforms for X3
 xinverse2(n) = iztrans(X3);
+% change syms function to a numerical function
+xinv2_func = double(xinverse2(0:40));
 
 % inverse z transforms` plot
+% Time Domain functions for X(2z) and X(z^3)
 figure;
 subplot(2,1,1);
-ezplot(n,xinverse1);
+stem(xinv1_func,'LineWidth',2,'color','b');
+title('Time domain for X(2z)','interpreter','latex');
 subplot(2,1,2);
-ezplot(n,xinverse2);
-
- 
+stem(xinv2_func,'LineWidth',2,'color','b');
+title('Time domain for X(z power 3)','interpreter','latex');
 end
 
-%Qu
+%Question 2.2
