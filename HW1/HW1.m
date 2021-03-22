@@ -2,10 +2,10 @@
 % sections in the code
 
 %%
-% Ques.1
+% Ques.1.1
 % Wireworld - 2d_fourColor_Cellular Automation 
 % 0 - > empty , 1 - > conductor , 2 - > electron head , 3 - > electron tail
-% empty : White ,conductor : Blue, electron head : Yellow , electron tail : red 
+% empty : white ,conductor : green, electron head : purple , electron tail : red 
 % I have defined a function which user can choose size of the table and
 % and number of generations
 
@@ -41,6 +41,7 @@ function WireWorld(size, gens)
                         counter = 0;
                         for k = -1:1:1
                             for j = -1:1:1
+                                % counting down number of electron head neigbors
                                 if(k ~= 0 || j ~= 0)
                                     if(x == 1 && y == 1 && k > -1 && j > -1)
                                         if (CurrentCells(x+k, y+j) == 2)
@@ -128,6 +129,7 @@ function cells = Input(in)
 end
 
 function drawTable(cells)
+    % creating the table
     sizeOfAxis = length(cells);
     axis equal; grid on; cla; axis([1, sizeOfAxis+1, 1, sizeOfAxis+1]);
     set(gca, 'xtick', 1:sizeOfAxis+1, 'ytick', 1:sizeOfAxis+1);
@@ -136,23 +138,14 @@ function drawTable(cells)
     for x = 1:sizeOfAxis
 		for y = 1:sizeOfAxis
             if cells(x, y) == 1	% conductor
-				rectangle('position', [x, y, 1, 1], 'facecolor', 'g');
+				rectangle('position', [x, y, 1, 1], 'facecolor', '#0B7942');
             elseif cells(x, y) == 2	% electron head
-				rectangle('position', [x, y, 1, 1], 'facecolor', 'y');
+				rectangle('position', [x, y, 1, 1], 'facecolor', '#732661');
             elseif cells(x, y) == 3	% electron tail
-				rectangle('position', [x, y, 1, 1], 'facecolor', 'r');
+				rectangle('position', [x, y, 1, 1], 'facecolor', '#A81818');
 			end
 		end
     end
-
-
 end
-
-
-
-
-
-
-
-
 %%
+% Ques.1.2
