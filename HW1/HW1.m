@@ -13,7 +13,7 @@ WireWorld(20,200);
 
 %%
 % Ques.2.1
-% We want to calculate the Z Transition of the x[n] given below
+% We want to calculate the Z transform of the x[n] given below
 Z_Transform();
 %%
 %% all the functions
@@ -183,7 +183,7 @@ subplot(1,3,2);
 zplane(zeros2, poles2); % zero-pole plot for X(2z)
 title('X(2z)');
 
-% inverse z transition for X2
+% inverse z transform for X2
 xinverse1(n) = iztrans(X2);
 
 
@@ -202,10 +202,10 @@ title('X(z^3)');
 %and z^3 = 0 would put three zeros in out vector and this cause errors if
 %we use zeros3(1:6) while plotting zeros
 
-% inverse z transition for X3
+% inverse z transforms for X3
 xinverse2(n) = iztrans(X3);
 
-% inverse z transitions` plot
+% inverse z transforms` plot
 figure;
 subplot(2,1,1);
 ezplot(n,xinverse1);
@@ -215,3 +215,4 @@ ezplot(n,xinverse2);
  
 end
 
+%Qu
