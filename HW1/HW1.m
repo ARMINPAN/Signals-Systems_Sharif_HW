@@ -9,7 +9,7 @@
 % I have defined a function which user can choose size of the table and
 % and number of generations
 WireWorld(20,50);
-
+%doros kon line comment kardanara
 %%
 % Ques.2.1 
 % We want to calculate the Z transform of the x[n] given below
@@ -17,9 +17,12 @@ Z_Transform();
 %% 
 % Ques.2.2
 % Inverse Z transform
-
-
-
+% Question 2.2.1 - finding zeros-poles of H1(z) and H2(z) by 
+ZerosPoles();
+% Question 2.2.2 - calculating partial fractions
+partial_fraction();
+% Question 2.2.3 - calculating inverse z transform
+Inverse_Z_Transform();
 %% all the functions
 %Question 1
 function WireWorld(size, gens)
@@ -240,3 +243,67 @@ title('Time domain for X(z power 3)','interpreter','latex');
 end
 
 %Question 2.2
+%Question 2.2.1 - finding zeros-poles of H1(z) and H2(z)
+function ZerosPoles()
+syms z
+H1 = (1-z^-1)/(1-z^(-1)+0.5*z^(-2));
+H2 = z^(-1)/(2-3^(1/2)*z^(-1)+0.5*z^(-2));
+[numerator1, denominator1] = numden(H1);
+zeros1 = solve(numerator1 == 0);
+poles1 = solve(denominator1 == 0);
+
+[numerator2, denominator2] = numden(H2);
+zeros2 = solve(numerator2 == 0);
+poles2 = solve(denominator2 == 0);
+class(zeros2)
+subplot(2,1,1);
+zplane(double(zeros1),double(poles1)); % zero-pole plot for H1(z)
+title('H1(z)','interpreter','latex');
+subplot(2,1,2);
+zplane(double(zeros2),double(poles2)); % zero-pole plot for H2(z)
+title('H2(z)','interpreter','latex');
+end
+
+%Question 2.2.2 - calculating partial fractions
+function partial_fraction()
+% by residuez function
+
+z = tf('z');
+H1 = (1-z^-1)/(1-z^(-1)+0.5*z^(-2));
+H2 = z^(-1)/(2-3^(1/2)*z^(-1)+0.5*z^(-2));
+
+% at first we have to find coefficients of our transfer function using tfdata
+[numerator1, denominator1] = tfdata(H1);
+numerator1 = cell2mat(numerator1);
+denominator1 = cell2mat(denominator1);
+[numerator2, denominator2] = tfdata(H2);
+numerator2 = cell2mat(numerator2);
+denominator2 = cell2mat(denominator2);
+
+% remove zeros in numerator1 and denominator1
+%H1 coefficients
+numerator1 = numerator1(numerator1~=0);
+denominator1 = denominator1(denominator1~=0);
+%H2 coefficients
+numerator2 = numerator2(numerator2~=0);
+denominator2 = denominator2(denominator2~=0);
+
+[ro1,po1,ko1] = residuez(numerator1, denominator1);
+[ro2,po2,ko2] = residuez(numerator2, denominator2);
+end
+
+%Question 2.2.3 - calculating inverse z transform by iztrans
+
+function Inverse_Z_Transform()
+syms n integer
+syms z
+H1 = (1-z^-1)/(1-z^(-1)+0.5*z^(-2));
+H2 = z^(-1)/(2-3^(1/2)*z^(-1)+0.5*z^(-2));
+%inverses
+xinverse1(n) = iztrans(H1);
+xinverse2(n) = iztrans(H2);
+
+%plotting the inverses
+stem(double(xinverse1(0:40)))
+stem(double(xinverse2(0:40)))
+end
