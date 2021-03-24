@@ -19,10 +19,19 @@ Z_Transform();
 % Inverse Z transform
 % Question 2.2.1 - finding zeros-poles of H1(z) and H2(z) by 
 ZerosPoles();
-% Question 2.2.2 - calculating partial fractions
+% Question 2.2.2 - calculating partial fractions and inverse z transform
 partial_fraction();
-% Question 2.2.3 - calculating inverse z transform
+% Question 2.2.3 - calculating inverse z transform by iztrans
 Inverse_Z_Transform();
+%%
+% Question.2.3
+% we want to find the impolse response of a LTI system which described by
+% the difference equation below in different ways
+% y[n] − 0.7y[n − 1] + 0.49y[n − 2] = 2x[n] − x[n − 1]
+%1
+ImpulseResp_ZTrans();
+
+%2
 %% all the functions
 %Question 1
 function WireWorld(size, gens)
@@ -245,6 +254,7 @@ end
 %Question 2.2
 %Question 2.2.1 - finding zeros-poles of H1(z) and H2(z)
 function ZerosPoles()
+figure;
 syms z
 H1 = (1-z^-1)/(1-z^(-1)+0.5*z^(-2));
 H2 = z^(-1)/(2-3^(1/2)*z^(-1)+0.5*z^(-2));
@@ -255,7 +265,6 @@ poles1 = solve(denominator1 == 0);
 [numerator2, denominator2] = numden(H2);
 zeros2 = solve(numerator2 == 0);
 poles2 = solve(denominator2 == 0);
-class(zeros2)
 subplot(2,1,1);
 zplane(double(zeros1),double(poles1)); % zero-pole plot for H1(z)
 title('H1(z)','interpreter','latex');
@@ -264,10 +273,11 @@ zplane(double(zeros2),double(poles2)); % zero-pole plot for H2(z)
 title('H2(z)','interpreter','latex');
 end
 
-%Question 2.2.2 - calculating partial fractions
+%Question 2.2.2 and 2.2.4 - calculating partial fractions and z inverse 2.2.2-> assume our
+%system is right sided (casual) and  2.2.4-> our system is left sided and anti-casual
 function partial_fraction()
 % by residuez function
-
+figure;
 z = tf('z');
 H1 = (1-z^-1)/(1-z^(-1)+0.5*z^(-2));
 H2 = z^(-1)/(2-3^(1/2)*z^(-1)+0.5*z^(-2));
@@ -280,7 +290,8 @@ denominator1 = cell2mat(denominator1);
 numerator2 = cell2mat(numerator2);
 denominator2 = cell2mat(denominator2);
 
-% remove zeros in numerator1 and denominator1
+% remove zeros in numerator1 and denominator1 except one zero that is b0
+% in H2
 %H1 coefficients
 numerator1 = numerator1(numerator1~=0);
 denominator1 = denominator1(denominator1~=0);
@@ -288,13 +299,37 @@ denominator1 = denominator1(denominator1~=0);
 numerator2 = numerator2(numerator2~=0);
 denominator2 = denominator2(denominator2~=0);
 
-[ro1,po1,ko1] = residuez(numerator1, denominator1);
-[ro2,po2,ko2] = residuez(numerator2, denominator2);
+%partial fractions
+[ro1,po1,ko1] = residuez(numerator1, denominator1)
+[ro2,po2,ko2] = residuez([0,numerator2], denominator2)
+
+% now we have the valuse of poles and residuez so the time domain function
+% are just I have written in stem
+% now z inverse calculating - assume the inverses are right sided
+n = 0:30;
+subplot(1,2,1);
+stem(((0.5000 + 0.5000i)*(0.5000 + 0.5000i).^n + (0.5000 - 0.5000i)*(0.5000 - 0.5000i).^n),'LineWidth',2,'color','b');
+title('Casual Time Domain of H1(z) by partial fraction','interpreter','latex');
+subplot(1,2,2);
+stem(((-i)*(0.4330 + 0.2500i).^n + (i)*(0.4330 - 0.2500i).^n),'LineWidth',2,'color','b');
+title('Casual Time Domain of H2(z) by partial fraction','interpreter','latex');
+
+
+% now assume our system is anti-casual
+figure;
+n = -30:-1;
+subplot(1,2,1);
+stem([-30:-1],(-(0.5000 + 0.5000i)*(0.5000 + 0.5000i).^(n) - (0.5000 - 0.5000i)*(0.5000 - 0.5000i).^(n)),'LineWidth',2,'color','b');
+title('Anti-Casual Time Domain of H1(z) by partial fraction','interpreter','latex');
+subplot(1,2,2);
+stem([-30:-1],-((1i)*(0.4330 + 0.2500i).^(n) - (1i)*(0.4330 - 0.2500i).^(n)),'LineWidth',2,'color','b');
+title('Anti-Casual Time Domain of H2(z) by partial fraction','interpreter','latex');
+
 end
 
 %Question 2.2.3 - calculating inverse z transform by iztrans
-
 function Inverse_Z_Transform()
+figure;
 syms n integer
 syms z
 H1 = (1-z^-1)/(1-z^(-1)+0.5*z^(-2));
@@ -304,6 +339,41 @@ xinverse1(n) = iztrans(H1);
 xinverse2(n) = iztrans(H2);
 
 %plotting the inverses
-stem(double(xinverse1(0:40)))
-stem(double(xinverse2(0:40)))
+subplot(1,2,1);
+stem(double(xinverse1(0:30)),'LineWidth',2,'color','b')
+title('Time Domain of H1(z) by iztrans','interpreter','latex');
+subplot(1,2,2);
+stem(double(xinverse2(0:30)),'LineWidth',2,'color','b')
+title('Time Domain H2(z) by iztrans','interpreter','latex');
+end
+
+% Question 2.3
+% we want to find the impolse response of a LTI system which described by
+% the difference equation below
+% y[n] − 0.7y[n − 1] + 0.49y[n − 2] = 2x[n] − x[n − 1]
+% Method 1 - by Z Transform
+function ImpulseResp_ZTrans()
+% if we get z transform of both sides, Transfer function H(z)=Y(z)/X(z) is:
+figure;
+
+z = tf('z');
+H = (2-z^(-1))/(1-0.7*z^(-1)+0.49*z^(-2));
+
+% at first we have to find coefficients of our transfer function using tfdata
+[numerator, denominator] = tfdata(H);
+numerator = cell2mat(numerator);
+denominator = cell2mat(denominator);
+% remove zeros in numerator and denominator
+%H coefficients
+numerator = numerator(numerator~=0);
+denominator = denominator(denominator~=0);
+
+%partial fractions
+[ro,po,ko] = residuez(numerator, denominator);
+
+%now we have residuez and the poles and so we have partial fraction of H(z)
+%so we have impulse response by inverse z transform
+n = 1:30;
+stem((1.0000 + 0.2474i)*((0.3500 + 0.6062i).^n) + (1.0000 - 0.2474i)*((0.3500 - 0.6062i).^n),'LineWidth',2,'color','b');
+title('Impulse response by partial fraction','interpreter','latex');
 end
