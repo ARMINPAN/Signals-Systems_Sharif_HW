@@ -23,6 +23,7 @@ ZerosPoles();
 partial_fraction();
 % Question 2.2.3 - calculating inverse z transform by iztrans
 Inverse_Z_Transform();
+
 %%
 % Question.2.3
 % we want to find the impolse response of a LTI system which described by
@@ -32,6 +33,12 @@ Inverse_Z_Transform();
 ImpulseResp_ZTrans();
 
 %2
+ImpulseResp_Coefficients();
+
+%3
+ImpulseResp_Filter();
+
+%via simulink
 %% all the functions
 %Question 1
 function WireWorld(size, gens)
@@ -244,10 +251,10 @@ xinv2_func = double(xinverse2(0:40));
 % Time Domain functions for X(2z) and X(z^3)
 figure;
 subplot(2,1,1);
-stem(xinv1_func,'LineWidth',2,'color','b');
+stem([0:40],xinv1_func,'LineWidth',2,'color','b');
 title('Time domain for X(2z)','interpreter','latex');
 subplot(2,1,2);
-stem(xinv2_func,'LineWidth',2,'color','b');
+stem([0:40],xinv2_func,'LineWidth',2,'color','b');
 title('Time domain for X(z power 3)','interpreter','latex');
 end
 
@@ -308,10 +315,10 @@ denominator2 = denominator2(denominator2~=0);
 % now z inverse calculating - assume the inverses are right sided
 n = 0:30;
 subplot(1,2,1);
-stem(((0.5000 + 0.5000i)*(0.5000 + 0.5000i).^n + (0.5000 - 0.5000i)*(0.5000 - 0.5000i).^n),'LineWidth',2,'color','b');
+stem([0:30],((0.5000 + 0.5000i)*(0.5000 + 0.5000i).^n + (0.5000 - 0.5000i)*(0.5000 - 0.5000i).^n),'LineWidth',2,'color','b');
 title('Casual Time Domain of H1(z) by partial fraction','interpreter','latex');
 subplot(1,2,2);
-stem(((-i)*(0.4330 + 0.2500i).^n + (i)*(0.4330 - 0.2500i).^n),'LineWidth',2,'color','b');
+stem([0:30],((-i)*(0.4330 + 0.2500i).^n + (i)*(0.4330 - 0.2500i).^n),'LineWidth',2,'color','b');
 title('Casual Time Domain of H2(z) by partial fraction','interpreter','latex');
 
 
@@ -340,10 +347,10 @@ xinverse2(n) = iztrans(H2);
 
 %plotting the inverses
 subplot(1,2,1);
-stem(double(xinverse1(0:30)),'LineWidth',2,'color','b')
+stem([0:30],double(xinverse1(0:30)),'LineWidth',2,'color','b')
 title('Time Domain of H1(z) by iztrans','interpreter','latex');
 subplot(1,2,2);
-stem(double(xinverse2(0:30)),'LineWidth',2,'color','b')
+stem([0:30],double(xinverse2(0:30)),'LineWidth',2,'color','b')
 title('Time Domain H2(z) by iztrans','interpreter','latex');
 end
 
@@ -351,7 +358,7 @@ end
 % we want to find the impolse response of a LTI system which described by
 % the difference equation below
 % y[n] − 0.7y[n − 1] + 0.49y[n − 2] = 2x[n] − x[n − 1]
-% Method 1 - by Z Transform
+% 2.3.1 -> Method 1 - by Z Transform
 function ImpulseResp_ZTrans()
 % if we get z transform of both sides, Transfer function H(z)=Y(z)/X(z) is:
 figure;
@@ -373,7 +380,57 @@ denominator = denominator(denominator~=0);
 
 %now we have residuez and the poles and so we have partial fraction of H(z)
 %so we have impulse response by inverse z transform
-n = 1:30;
-stem((1.0000 + 0.2474i)*((0.3500 + 0.6062i).^n) + (1.0000 - 0.2474i)*((0.3500 - 0.6062i).^n),'LineWidth',2,'color','b');
+n = 0:30;
+stem(n,(1.0000 + 0.2474i)*((0.3500 + 0.6062i).^n) + (1.0000 - 0.2474i)*((0.3500 - 0.6062i).^n),'LineWidth',2,'color','b');
 title('Impulse response by partial fraction','interpreter','latex');
 end
+
+% 2.3.2 -> Method 2 - h[n] = sigma (alpha_i * p_i^n)u[n]-finding alpha_i s with
+% help of the intial conditions 
+% if we calculate on paper h[0] = 2 and h[1] = 0.4
+% we have the poles from part 2.3.1 which are 0.3500 +- 0.6062i
+function ImpulseResp_Coefficients()
+figure;
+syms n integer;
+assume(n >= 0);
+syms alpha_1 alpha_2
+h(n) = alpha_1*(0.3500 + 0.6062i).^n + alpha_2*(0.3500 - 0.6062i).^n;
+coefs = solve(h(0) == 2, h(1) == 0.4);
+
+alpha1 = coefs.alpha_1;
+alpha2 = coefs.alpha_2;
+
+%impulse response
+m = 0:30;
+stem(m,alpha1*(0.3500 + 0.6062i).^m + alpha2*(0.3500 - 0.6062i).^m,'LineWidth',2,'color','b');
+title('Impulse response Question2.3.2','interpreter','latex');
+end
+
+% 2.3.3 -> Method 3 - using filter function to find impulse response
+function ImpulseResp_Filter()
+figure;
+
+z = tf('z');
+H = (2-z^(-1))/(1-0.7*z^(-1)+0.49*z^(-2));
+
+% at first we have to find coefficients of our transfer function using tfdata
+[numerator, denominator] = tfdata(H);
+numerator = cell2mat(numerator);
+denominator = cell2mat(denominator);
+% remove zeros in numerator and denominator
+%H coefficients
+numerator = numerator(numerator~=0);
+denominator = denominator(denominator~=0);
+
+x = zeros(1,30);
+x(1) = 1;
+
+h = filter(numerator,denominator,x);
+n = 0:29;
+stem(n,h,'LineWidth',2,'color','b');
+title('Impulse response using filter function','interpreter','latex');
+end
+
+% 2.3.4 -> Method 4 - using simulink and designing the system
+% file has been attached in the same directory
+
