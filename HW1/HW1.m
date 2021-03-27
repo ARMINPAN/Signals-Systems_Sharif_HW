@@ -16,6 +16,7 @@ WireWorld(20,50);
 Z_Transform();
 %% 
 % Ques.2.2
+%you can comment Questions you don`t need for a faster simulation
 % Inverse Z transform
 % Question 2.2.1 - finding zeros-poles of H1(z) and H2(z) by 
 ZerosPoles();
@@ -26,6 +27,7 @@ Inverse_Z_Transform();
 
 %%
 % Question.2.3
+%you can comment Questions you don`t need for a faster simulation
 % we want to find the impolse response of a LTI system which described by
 % the difference equation below in different ways
 % y[n] − 0.7y[n − 1] + 0.49y[n − 2] = 2x[n] − x[n − 1]
@@ -39,6 +41,34 @@ ImpulseResp_Coefficients();
 ImpulseResp_Filter();
 
 %via simulink
+%%
+% Question 2.4.
+% making music - Karplus-Strong
+% This system is described by the equation below
+% y[n] = x[n] + 1/2(y[n-N] + y[n-(N+1)])
+% N is the samples of x[n]
+FS = 44100; % sampling frequency
+%N = floor(44100/freq);
+%%
+%you can comment Questions you don`t need for a faster simulation
+% Question.3.1.1
+Laplace_Transform();
+
+% Question.3.1.2
+stepResponse();
+
+% Question.3.1.3
+question3_1_3();
+
+% Question.3.1.4
+question3_1_4();
+%%
+% Question.3.2
+% analyzing a circuit using laplace transform
+Circuit();
+%%
+% Question 3.3
+% simulink file has attached
 %% all the functions
 %Question 1
 function WireWorld(size, gens)
@@ -253,9 +283,11 @@ figure;
 subplot(2,1,1);
 stem([0:40],xinv1_func,'LineWidth',2,'color','b');
 title('Time domain for X(2z)','interpreter','latex');
+grid on;
 subplot(2,1,2);
 stem([0:40],xinv2_func,'LineWidth',2,'color','b');
 title('Time domain for X(z power 3)','interpreter','latex');
+grid on;
 end
 
 %Question 2.2
@@ -317,10 +349,11 @@ n = 0:30;
 subplot(1,2,1);
 stem([0:30],((0.5000 + 0.5000i)*(0.5000 + 0.5000i).^n + (0.5000 - 0.5000i)*(0.5000 - 0.5000i).^n),'LineWidth',2,'color','b');
 title('Casual Time Domain of H1(z) by partial fraction','interpreter','latex');
+grid on;
 subplot(1,2,2);
 stem([0:30],((-i)*(0.4330 + 0.2500i).^n + (i)*(0.4330 - 0.2500i).^n),'LineWidth',2,'color','b');
 title('Casual Time Domain of H2(z) by partial fraction','interpreter','latex');
-
+grid on;
 
 % now assume our system is anti-casual
 figure;
@@ -328,10 +361,11 @@ n = -30:-1;
 subplot(1,2,1);
 stem([-30:-1],(-(0.5000 + 0.5000i)*(0.5000 + 0.5000i).^(n) - (0.5000 - 0.5000i)*(0.5000 - 0.5000i).^(n)),'LineWidth',2,'color','b');
 title('Anti-Casual Time Domain of H1(z) by partial fraction','interpreter','latex');
+grid on;
 subplot(1,2,2);
 stem([-30:-1],-((1i)*(0.4330 + 0.2500i).^(n) - (1i)*(0.4330 - 0.2500i).^(n)),'LineWidth',2,'color','b');
 title('Anti-Casual Time Domain of H2(z) by partial fraction','interpreter','latex');
-
+grid on;
 end
 
 %Question 2.2.3 - calculating inverse z transform by iztrans
@@ -349,9 +383,11 @@ xinverse2(n) = iztrans(H2);
 subplot(1,2,1);
 stem([0:30],double(xinverse1(0:30)),'LineWidth',2,'color','b')
 title('Time Domain of H1(z) by iztrans','interpreter','latex');
+grid on;
 subplot(1,2,2);
 stem([0:30],double(xinverse2(0:30)),'LineWidth',2,'color','b')
 title('Time Domain H2(z) by iztrans','interpreter','latex');
+grid on;
 end
 
 % Question 2.3
@@ -383,6 +419,7 @@ denominator = denominator(denominator~=0);
 n = 0:30;
 stem(n,(1.0000 + 0.2474i)*((0.3500 + 0.6062i).^n) + (1.0000 - 0.2474i)*((0.3500 - 0.6062i).^n),'LineWidth',2,'color','b');
 title('Impulse response by partial fraction','interpreter','latex');
+grid on;
 end
 
 % 2.3.2 -> Method 2 - h[n] = sigma (alpha_i * p_i^n)u[n]-finding alpha_i s with
@@ -404,6 +441,7 @@ alpha2 = coefs.alpha_2;
 m = 0:30;
 stem(m,alpha1*(0.3500 + 0.6062i).^m + alpha2*(0.3500 - 0.6062i).^m,'LineWidth',2,'color','b');
 title('Impulse response Question2.3.2','interpreter','latex');
+grid on;
 end
 
 % 2.3.3 -> Method 3 - using filter function to find impulse response
@@ -429,8 +467,221 @@ h = filter(numerator,denominator,x);
 n = 0:29;
 stem(n,h,'LineWidth',2,'color','b');
 title('Impulse response using filter function','interpreter','latex');
+grid on;
 end
 
 % 2.3.4 -> Method 4 - using simulink and designing the system
 % file has been attached in the same directory
 
+
+% Question 2.4
+
+
+
+%
+
+
+
+% Question 3.1.1 - Laplace Transform
+function Laplace_Transform()
+% plot poles of the systems below
+figure;
+
+syms s
+H1 = 1/(s^3 + 40*s^2 + 10*s + 500);
+H2 = 1/(s^4 + 12.5*s^3 + 10*s^2 + 1);
+
+% now we have to find the poles which are the roots of denominators
+[numerator1, denominator1] = numden(H1);
+zeros1 = [];
+poles1 = solve(denominator1 == 0);
+
+[numerator2, denominator2] = numden(H2);
+zeros2 = [];
+poles2 = solve(denominator2 == 0);
+
+% plot the poles
+subplot(1,2,1);
+zplane(zeros1,double(poles1));
+title('H1(s)','interpreter','latex');
+subplot(1,2,2);
+zplane(zeros2,double(poles2));
+title('H2(s)','interpreter','latex');
+end
+
+% Question 3.1.2 - find the response of the systems when input is unit step
+function stepResponse()
+figure;
+
+syms s;
+syms n integer;
+assume(n >= 0);
+
+H1 = 1/(s^3 + 40*s^2 + 10*s + 500);
+H2 = 1/(s^4 + 12.5*s^3 + 10*s^2 + 1);
+
+% use ilaplace to find unit step response by inverse laplace transform
+h1_inv(n) = ilaplace(H1/s,s,n);
+h2_inv(n) = ilaplace(H2/s,s,n);
+
+h1 = double(h1_inv(1:0.1:50));
+h2 = double(h2_inv(1:0.1:50));
+
+subplot(2,1,1);
+plot((1:0.1:50),h1,'LineWidth',2,'color','b');
+title('Unit Step Response of y1(t)','interpreter','latex');
+grid on;
+subplot(2,1,2);
+plot((1:0.1:50),h2,'LineWidth',2,'color','b');
+title('Unit Step Response of y2(t)','interpreter','latex');
+grid on;
+end
+
+% Question 3.1.3 
+function question3_1_3()
+figure;
+
+syms s;
+syms n integer;
+assume(n >= 0);
+
+a = [4, 5, 6];
+H1 = (2*s+1)/(s^2 + a(1)*s + 7);
+H2 = (2*s+1)/(s^2 + a(2)*s + 7);
+H3 = (2*s+1)/(s^2 + a(3)*s + 7);
+
+%impulse responses of the 3 systems
+h1_inv(n) = ilaplace(H1,s,n);
+h2_inv(n) = ilaplace(H2,s,n);
+h3_inv(n) = ilaplace(H3,s,n);
+
+h1 = double(h1_inv(0:0.01:10));
+h2 = double(h2_inv(0:0.01:10));
+h3 = double(h3_inv(0:0.01:10));
+
+%plot impulse responses
+
+plot((0:0.01:10),h1);
+hold on;
+plot((0:0.01:10),h2);
+hold on;
+plot((0:0.01:10),h3);
+title('Impulse Response of y(t) for different valuse of a','interpreter','latex');
+legend('a = 4','a = 5','a = 6');
+grid on;
+
+%find unit step responses
+figure;
+%unit step response responses of the 3 systems
+h1_inv(n) = ilaplace(H1/s,s,n);
+h2_inv(n) = ilaplace(H2/s,s,n);
+h3_inv(n) = ilaplace(H3/s,s,n);
+
+h1 = double(h1_inv(0:0.01:10));
+h2 = double(h2_inv(0:0.01:10));
+h3 = double(h3_inv(0:0.01:10));
+
+%plot unit step responses
+
+plot((0:0.01:10),h1);
+hold on;
+plot((0:0.01:10),h2);
+hold on;
+plot((0:0.01:10),h3);
+title('Unit Step Response of y(t) for different valuse of a','interpreter','latex');
+legend('a = 4','a = 5','a = 6');
+grid on;
+end
+
+
+% Question 3.1.4
+function question3_1_4()
+    figure;
+    
+    syms s;
+    syms n integer;
+    assume(n >= 0);
+    H1 = tf([1 1],[1 3 4]);
+    H2 = tf([1 1],[1 3 4 0]);
+    H3 = tf([1 1],[1 3 4 0 0]);
+   
+    % use feedback function to create a feedback 
+    H1_new = feedback(H1,1);
+    H2_new = feedback(H2,1);
+    H3_new = feedback(H3,1);
+    
+    % change this transfer func`s to syms functions to use in ilaplace
+    [Num,Den] = tfdata(H1_new);
+    H1_neww = poly2sym(cell2mat(Num),s)/poly2sym(cell2mat(Den),s);
+    [Num,Den] = tfdata(H2_new);
+    H2_neww = poly2sym(cell2mat(Num),s)/poly2sym(cell2mat(Den),s);
+    [Num,Den] = tfdata(H3_new);
+    H3_neww = poly2sym(cell2mat(Num),s)/poly2sym(cell2mat(Den),s);
+    
+    % unit step responses
+    h1_inv(n) = ilaplace(H1_neww/s,s,n);
+    h2_inv(n) = ilaplace(H2_neww/s,s,n);
+    h3_inv(n) = ilaplace(H3_neww/s,s,n);
+    
+    h1 = double(h1_inv(0:0.1:50));
+    h2 = double(h2_inv(0:0.1:50));
+    h3 = double(h3_inv(0:0.1:50));
+    
+    %plot unit step responses
+    
+    subplot(1,2,1);
+    plot((0:0.1:50),h1);
+    hold on;
+    plot((0:0.1:50),h2);
+    hold on;
+    plot((0:0.1:50),h3);
+    title('Unit Step Response of y1(t)/y2(t)/y3(t)','interpreter','latex');
+    legend('y1(t)','y2(t)','y3(t)');
+    grid on;
+    
+    %plot ramp resposes
+    
+    subplot(1,2,2);
+    n = 0:0.1:50;  % the time vector
+    input = n;   % assuming ramp with slope=1
+    y = lsim(H1_new, input, n);
+    plot(n,y);
+    hold on;
+    y = lsim(H2_new, input, n);
+    plot(n,y);
+    hold on;
+    y = lsim(H3_new, input, n);
+    plot(n,y);
+    legend('y1(t)','y2(t)','y3(t)');
+    grid on;
+end
+
+% Question 3.2
+% the differential equation which describes the Q of capacitor:
+% 6u(t) = 0.06 d^2(Qc)/d^2t + 0.32 dQc/dt + Qc
+function Circuit()
+    figure;
+    
+    syms s;
+    syms n integer;
+    assume (n>=0);
+    Q = 6/(s*(0.06*s^2 + 0.32*s + 1));
+    Q_inverse(n) = ilaplace(Q,s,n);
+    Ic = diff(Q_inverse);
+    Q_inv = double(Q_inverse(0:0.01:5));
+    Ic = double(Ic(0:0.01:5));
+    
+    subplot(1,2,1); 
+    plot((0:0.01:5),Q_inv,'LineWidth',2,'color','b');
+    title('Charge of the Capacitor','interpreter','latex');
+    grid on;
+    subplot(1,2,2);
+    plot((0:0.01:5),Ic,'LineWidth',2,'color','b');
+    title('Current of the Circuit','interpreter','latex');
+    grid on;
+    
+end
+
+
+% Question 3.3
+% simulink file has attached
