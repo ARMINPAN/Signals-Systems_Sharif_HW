@@ -69,6 +69,8 @@ Circuit();
 %%
 % Question 3.3
 % simulink file has attached
+% c1 = g/l , c2 = c/(ml) , c3 = 1/(ml^2)
+
 %% all the functions
 %Question 1
 function WireWorld(size, gens)
