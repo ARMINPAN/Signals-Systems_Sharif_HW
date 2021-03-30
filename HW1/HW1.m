@@ -1,15 +1,17 @@
 % all the questions are in this code and they`ve got seperated by different
 % sections in the code
 % functions are defined at the end of the code
+% it`s better if you comment questions in a section that you don`t want to
+% check and just leave the one you want uncommented
 %%
 % Ques.1.1 and 1.2
-% Wireworld - 2d_fourColor_Cellular Automation 
+% Wireworld - 2d_fourColor_Cellular Automaton 
 % 0 - > empty , 1 - > conductor , 2 - > electron head , 3 - > electron tail
 % empty : white ,conductor : green, electron head : purple , electron tail : red 
-% I have defined a function which user can choose size of the table and
-% and number of generations
-WireWorld(20,50);
-%doros kon line comment kardanara
+% you can choose size of the table and number of generations in the inputs
+% of the function WireWorld
+WireWorld(20,200);
+% the parts which you may need to comment has been declared in the function
 %%
 % Ques.2.1 
 % We want to calculate the Z transform of the x[n] given below
@@ -19,11 +21,11 @@ Z_Transform();
 %you can comment Questions you don`t need for a faster simulation
 % Inverse Z transform
 % Question 2.2.1 - finding zeros-poles of H1(z) and H2(z) by 
-ZerosPoles();
-% Question 2.2.2 - calculating partial fractions and inverse z transform
+%ZerosPoles();
+% Question 2.2.2and and 2.2.4 - calculating partial fractions and inverse z transform
 partial_fraction();
 % Question 2.2.3 - calculating inverse z transform by iztrans
-Inverse_Z_Transform();
+%Inverse_Z_Transform();
 
 %%
 % Question.2.3
@@ -48,7 +50,26 @@ ImpulseResp_Filter();
 % y[n] = x[n] + 1/2(y[n-N] + y[n-(N+1)])
 % N is the samples of x[n]
 FS = 44100; % sampling frequency
-%N = floor(44100/freq);
+% notes
+notes = ['G', 'G', 'B', "D#", 'D', ...
+'G', 'G', 'B', 'D', 'C', ...
+'G', 'G', 'G', 'G', 'G', "G#", ...
+"G#", "G#", "G#", "G#", 'G', 'G'];
+
+% durations
+note_durations = [330, 330, 490, 490, 750, ...
+330, 330, 490, 490, 750, ...
+330, 330, 330, 490, 490, 700, ...
+330, 330, 330, 490, 490, 750];
+
+% find notes frequencies
+freq = NoteFrequency(notes);
+
+
+alpha = 0.99; % a positive feedback for stability of system
+
+% generate the notes
+NoteGeneration(freq, note_durations, alpha);
 %%
 %you can comment Questions you don`t need for a faster simulation
 % Question.3.1.1
@@ -88,7 +109,7 @@ function WireWorld(size, gens)
     
     % the periodic test case given in homework
     % if you don`t want to watch just this periodic behaviour, comment the line below and 
-    % line 56 to 58 and line 127
+    % line 131 to 133 
     %, this periodic behavior is just for the one in the homework_1
     % which enter a electron head from the left after each 4 moves
     countDown = 1; % for setting the period
@@ -107,9 +128,9 @@ function WireWorld(size, gens)
                 if(CurrentCells(x, y) ~= 0)
                     %just for periodic test case in the homework - comment 2lines below for
                     %other inputs, we put a ElecHead in to the start
-                    if(mod(countDown,5) == 0 && CurrentCells(1,y) == 1)
-                        nextStepCells(1,y) = 2;
-                    end
+%                     if(mod(countDown,5) == 0 && CurrentCells(1,y) == 1)
+%                         nextStepCells(1,y) = 2;
+%                     end
                     if CurrentCells(x, y) == 2 	% electron head to electron tail
                         nextStepCells(x, y) = 3;
                     end
@@ -228,168 +249,168 @@ end
 
 %Question 2.1
 function Z_Transform()
-syms z
-syms n integer
-assume(n >= 0);
-syms x(n)
-x(n) = cos(n*pi/6);
+    syms z
+    syms n integer
+    assume(n >= 0);
+    syms x(n)
+    x(n) = cos(n*pi/6);
 
-X(z) = ztrans(x); % Z transform of the x[n] in the command window
-% we use numden function and after that solve func to find zeros and poles
-[numerator1, denominator1] = numden(X);
-zeros1 = solve(numerator1 == 0);
-poles1 = solve(denominator1 == 0);
+    X(z) = ztrans(x) % Z transform of the x[n] in the command window
+    % we use numden function and after that solve func to find zeros and poles
+    [numerator1, denominator1] = numden(X);
+    zeros1 = solve(numerator1 == 0);
+    poles1 = solve(denominator1 == 0);
 
-subplot(1,3,1);
-zplane(zeros1, poles1); % zero-pole plot for X(z)
-title('X(z)','interpreter','latex');
-
-
-% part 2 - Question 2.1
-X2(z) = X(2*z); % X(2z)
-% we use numden function and after that solve func to find zeros and poles
-[numerator2, denominator2] = numden(X2);
-zeros2 = solve(numerator2 == 0);
-poles2 = solve(denominator2 == 0);
-
-subplot(1,3,2);
-zplane(zeros2, poles2); % zero-pole plot for X(2z)
-title('X(2z)','interpreter','latex');
-
-% inverse z transform for X2
-xinverse1(n) = iztrans(X2);
-% change syms function to a numerical function
-xinv1_func = double(xinverse1(0:40));
-
-% part 3 - Question 2.1
-X3 = X(z^3);% X(z^3)
-% we use numden function and after that solve func to find zeros and poles
-[numerator3, denominator3] = numden(X3);
-zeros3 = solve(numerator3 == 0);
-poles3 = solve(denominator3 == 0);
+    subplot(1,3,1);
+    zplane(zeros1, poles1); % zero-pole plot for X(z)
+    title('X(z)','interpreter','latex');
 
 
-subplot(1,3,3);
-zplane(double(zeros3), poles3); % zero-pole plot for X(z^3)
-title('X(z power 3)','interpreter','latex');
+    % part 2 - Question 2.1
+    X2(z) = X(2*z) % X(2z)
+    % we use numden function and after that solve func to find zeros and poles
+    [numerator2, denominator2] = numden(X2);
+    zeros2 = solve(numerator2 == 0);
+    poles2 = solve(denominator2 == 0);
+
+    subplot(1,3,2);
+    zplane(zeros2, poles2); % zero-pole plot for X(2z)
+    title('X(2z)','interpreter','latex');
+
+    % inverse z transform for X2
+    xinverse1(n) = iztrans(X2);
+    % change syms function to a numerical function
+    xinv1_func = double(xinverse1(0:20));
+
+    % part 3 - Question 2.1
+    X3 = X(z^3)% X(z^3)
+    % we use numden function and after that solve func to find zeros and poles
+    [numerator3, denominator3] = numden(X3);
+    zeros3 = solve(numerator3 == 0);
+    poles3 = solve(denominator3 == 0);
 
 
-% inverse z transforms for X3
-xinverse2(n) = iztrans(X3);
-% change syms function to a numerical function
-xinv2_func = double(xinverse2(0:40));
+    subplot(1,3,3);
+    zplane(double(zeros3), poles3); % zero-pole plot for X(z^3)
+    title('X(z power 3)','interpreter','latex');
 
-% inverse z transforms` plot
-% Time Domain functions for X(2z) and X(z^3)
-figure;
-subplot(2,1,1);
-stem([0:40],xinv1_func,'LineWidth',2,'color','b');
-title('Time domain for X(2z)','interpreter','latex');
-grid on;
-subplot(2,1,2);
-stem([0:40],xinv2_func,'LineWidth',2,'color','b');
-title('Time domain for X(z power 3)','interpreter','latex');
-grid on;
+
+    % inverse z transforms for X3
+    xinverse2(n) = iztrans(X3);
+    % change syms function to a numerical function
+    xinv2_func = double(xinverse2(0:40));
+
+    % inverse z transforms` plot
+    % Time Domain functions for X(2z) and X(z^3)
+    figure;
+    subplot(2,1,1);
+    stem([0:20],xinv1_func,'LineWidth',2,'color','b');
+    title('Time domain for X(2z)','interpreter','latex');
+    grid on;
+    subplot(2,1,2);
+    stem([0:40],xinv2_func,'LineWidth',2,'color','b');
+    title('Time domain for X(z power 3)','interpreter','latex');
+    grid on;
 end
 
 %Question 2.2
 %Question 2.2.1 - finding zeros-poles of H1(z) and H2(z)
 function ZerosPoles()
-figure;
-syms z
-H1 = (1-z^-1)/(1-z^(-1)+0.5*z^(-2));
-H2 = z^(-1)/(2-3^(1/2)*z^(-1)+0.5*z^(-2));
-[numerator1, denominator1] = numden(H1);
-zeros1 = solve(numerator1 == 0);
-poles1 = solve(denominator1 == 0);
+    figure;
+    syms z
+    H1 = (1-z^-1)/(1-z^(-1)+0.5*z^(-2));
+    H2 = z^(-1)/(2-3^(1/2)*z^(-1)+0.5*z^(-2));
+    [numerator1, denominator1] = numden(H1);
+    zeros1 = solve(numerator1 == 0);
+    poles1 = solve(denominator1 == 0);
 
-[numerator2, denominator2] = numden(H2);
-zeros2 = solve(numerator2 == 0);
-poles2 = solve(denominator2 == 0);
-subplot(2,1,1);
-zplane(double(zeros1),double(poles1)); % zero-pole plot for H1(z)
-title('H1(z)','interpreter','latex');
-subplot(2,1,2);
-zplane(double(zeros2),double(poles2)); % zero-pole plot for H2(z)
-title('H2(z)','interpreter','latex');
+    [numerator2, denominator2] = numden(H2);
+    zeros2 = solve(numerator2 == 0);
+    poles2 = solve(denominator2 == 0);
+    subplot(2,1,1);
+    zplane(double(zeros1),double(poles1)); % zero-pole plot for H1(z)
+    title('H1(z)','interpreter','latex');
+    subplot(2,1,2);
+    zplane(double(zeros2),double(poles2)); % zero-pole plot for H2(z)
+    title('H2(z)','interpreter','latex');
 end
 
 %Question 2.2.2 and 2.2.4 - calculating partial fractions and z inverse 2.2.2-> assume our
 %system is right sided (casual) and  2.2.4-> our system is left sided and anti-casual
 function partial_fraction()
-% by residuez function
-figure;
-z = tf('z');
-H1 = (1-z^-1)/(1-z^(-1)+0.5*z^(-2));
-H2 = z^(-1)/(2-3^(1/2)*z^(-1)+0.5*z^(-2));
+    % by residuez function
+    figure;
+    z = tf('z');
+    H1 = (1-z^-1)/(1-z^(-1)+0.5*z^(-2));
+    H2 = z^(-1)/(2-3^(1/2)*z^(-1)+0.5*z^(-2));
 
-% at first we have to find coefficients of our transfer function using tfdata
-[numerator1, denominator1] = tfdata(H1);
-numerator1 = cell2mat(numerator1);
-denominator1 = cell2mat(denominator1);
-[numerator2, denominator2] = tfdata(H2);
-numerator2 = cell2mat(numerator2);
-denominator2 = cell2mat(denominator2);
+    % at first we have to find coefficients of our transfer function using tfdata
+    [numerator1, denominator1] = tfdata(H1);
+    numerator1 = cell2mat(numerator1);
+    denominator1 = cell2mat(denominator1);
+    [numerator2, denominator2] = tfdata(H2);
+    numerator2 = cell2mat(numerator2);
+    denominator2 = cell2mat(denominator2);
 
-% remove zeros in numerator1 and denominator1 except one zero that is b0
-% in H2
-%H1 coefficients
-numerator1 = numerator1(numerator1~=0);
-denominator1 = denominator1(denominator1~=0);
-%H2 coefficients
-numerator2 = numerator2(numerator2~=0);
-denominator2 = denominator2(denominator2~=0);
+    % remove zeros in numerator1 and denominator1 except one zero that is b0
+    % in H2
+    %H1 coefficients
+    numerator1 = numerator1(numerator1~=0);
+    denominator1 = denominator1(denominator1~=0);
+    %H2 coefficients
+    numerator2 = numerator2(numerator2~=0);
+    denominator2 = denominator2(denominator2~=0);
 
-%partial fractions
-[ro1,po1,ko1] = residuez(numerator1, denominator1)
-[ro2,po2,ko2] = residuez([0,numerator2], denominator2)
+    %partial fractions
+    [ro1,po1,ko1] = residuez(numerator1, denominator1)
+    [ro2,po2,ko2] = residuez([0,numerator2], denominator2)
 
-% now we have the valuse of poles and residuez so the time domain function
-% are just I have written in stem
-% now z inverse calculating - assume the inverses are right sided
-n = 0:30;
-subplot(1,2,1);
-stem([0:30],((0.5000 + 0.5000i)*(0.5000 + 0.5000i).^n + (0.5000 - 0.5000i)*(0.5000 - 0.5000i).^n),'LineWidth',2,'color','b');
-title('Casual Time Domain of H1(z) by partial fraction','interpreter','latex');
-grid on;
-subplot(1,2,2);
-stem([0:30],((-i)*(0.4330 + 0.2500i).^n + (i)*(0.4330 - 0.2500i).^n),'LineWidth',2,'color','b');
-title('Casual Time Domain of H2(z) by partial fraction','interpreter','latex');
-grid on;
+    % now we have the valuse of poles and residuez so the time domain function
+    % are just I have written in stem
+    % now z inverse calculating - assume the inverses are right sided
+    n = 0:20;
+    subplot(1,2,1);
+    stem([0:20],((0.5000 + 0.5000i)*(0.5000 + 0.5000i).^n + (0.5000 - 0.5000i)*(0.5000 - 0.5000i).^n),'LineWidth',2,'color','b');
+    title('Casual Time Domain of H1(z) by partial fraction','interpreter','latex');
+    grid on;
+    subplot(1,2,2);
+    stem([0:20],((-i)*(0.4330 + 0.2500i).^n + (i)*(0.4330 - 0.2500i).^n),'LineWidth',2,'color','b');
+    title('Casual Time Domain of H2(z) by partial fraction','interpreter','latex');
+    grid on;
 
-% now assume our system is anti-casual
-figure;
-n = -30:-1;
-subplot(1,2,1);
-stem([-30:-1],(-(0.5000 + 0.5000i)*(0.5000 + 0.5000i).^(n) - (0.5000 - 0.5000i)*(0.5000 - 0.5000i).^(n)),'LineWidth',2,'color','b');
-title('Anti-Casual Time Domain of H1(z) by partial fraction','interpreter','latex');
-grid on;
-subplot(1,2,2);
-stem([-30:-1],-((1i)*(0.4330 + 0.2500i).^(n) - (1i)*(0.4330 - 0.2500i).^(n)),'LineWidth',2,'color','b');
-title('Anti-Casual Time Domain of H2(z) by partial fraction','interpreter','latex');
-grid on;
+    % now assume our system is anti-casual
+    figure;
+    n = -30:-1;
+    subplot(1,2,1);
+    stem([-30:-1],(-(0.5000 + 0.5000i)*(0.5000 + 0.5000i).^(n) - (0.5000 - 0.5000i)*(0.5000 - 0.5000i).^(n)),'LineWidth',2,'color','b');
+    title('Anti-Casual Time Domain of H1(z) by partial fraction','interpreter','latex');
+    grid on;
+    subplot(1,2,2);
+    stem([-30:-1],-((1i)*(0.4330 + 0.2500i).^(n) - (1i)*(0.4330 - 0.2500i).^(n)),'LineWidth',2,'color','b');
+    title('Anti-Casual Time Domain of H2(z) by partial fraction','interpreter','latex');
+    grid on;
 end
 
 %Question 2.2.3 - calculating inverse z transform by iztrans
 function Inverse_Z_Transform()
-figure;
-syms n integer
-syms z
-H1 = (1-z^-1)/(1-z^(-1)+0.5*z^(-2));
-H2 = z^(-1)/(2-3^(1/2)*z^(-1)+0.5*z^(-2));
-%inverses
-xinverse1(n) = iztrans(H1);
-xinverse2(n) = iztrans(H2);
+    figure;
+    syms n integer
+    syms z
+    H1 = (1-z^-1)/(1-z^(-1)+0.5*z^(-2));
+    H2 = z^(-1)/(2-3^(1/2)*z^(-1)+0.5*z^(-2));
+    %inverses
+    xinverse1(n) = iztrans(H1);
+    xinverse2(n) = iztrans(H2);
 
-%plotting the inverses
-subplot(1,2,1);
-stem([0:30],double(xinverse1(0:30)),'LineWidth',2,'color','b')
-title('Time Domain of H1(z) by iztrans','interpreter','latex');
-grid on;
-subplot(1,2,2);
-stem([0:30],double(xinverse2(0:30)),'LineWidth',2,'color','b')
-title('Time Domain H2(z) by iztrans','interpreter','latex');
-grid on;
+    %plotting the inverses
+    subplot(1,2,1);
+    stem([0:20],double(xinverse1(0:20)),'LineWidth',2,'color','b')
+    title('Time Domain of H1(z) by iztrans','interpreter','latex');
+    grid on;
+    subplot(1,2,2);
+    stem([0:20],double(xinverse2(0:20)),'LineWidth',2,'color','b')
+    title('Time Domain H2(z) by iztrans','interpreter','latex');
+    grid on;
 end
 
 % Question 2.3
@@ -477,9 +498,85 @@ end
 
 
 % Question 2.4
+% a function which founds the frequency of notes
+function freqss = NoteFrequency(note)
+    len = length(note);
+    freqs = zeros(1,len);
+    for i=1:len
+        if(note(1,i) == 'G')
+            freqs(i) = 783.99;
+        end
+        if(note(1,i) == "G#")
+            freqs(i) = 830.61;
+        end
+        if(note(1,i) == 'B')
+            freqs(i) = 493.88;
+        end
+        if(note(1,i) == 'E')
+            freqs(i) = 659.25;
+        end
+        if(note(1,i) == 'D')
+            freqs(i) = 587.33;
+        end
+        if(note(1,i) == "D#")
+            freqs(i) = 622.25;
+        end
+        if(note(1,i) == 'A')
+            freqs(i) = 440;
+        end
+        if(note(1,i) == "A#")
+            freqs(i) = 466.16;
+        end
+        if(note(1,i) == 'F')
+            freqs(i) = 698.46;
+        end
+        if(note(i) == "F#")
+            freqs(i) = 739.99;
+        end
+        if(note(1,i) == 'C')
+            freqs(i) = 523.25;
+        end
+        if(note(i) == "C#")
+            freqs(1,i) = 554.37;
+        end
+    end
+    freqss = freqs;
+end
+
+% generate the notes
+function NoteGeneration(freq, duration, alpha)
+    noteNum = length(freq);
+    FS = 44100;
+    %generating notes
+    for i=1:noteNum
+        N = floor(FS/freq(i)); % number of samples for each note
+        outputLength = (N*duration(i)*60);
+        x = zeros(1,N);
+        x(1,:) = randi([-1,1],1,N);
+        x=[x zeros(1,outputLength-N)];
+
+        y = zeros(1,outputLength); %output note
+        y(1:N) = x(1,1:N);
+        a=[1 zeros(1,N-1) -0.5 -0.5];  %denominator 
+        b=1;  %numerator 
+        y = filter(b,a,x); %output
+        sound(y,FS)
+    end
+    
 
 
+    
 
+
+    %diffrence equation which describes Karplus-strong
+    
+
+    y;
+    
+    % create the audio
+%     player = audioplayer(matlabFunction(y),FS);
+%     play(player); % play the music
+end
 %
 
 
