@@ -69,7 +69,11 @@ freq = NoteFrequency(notes);
 alpha = 0.99; % a positive feedback for stability of system
 
 % generate the notes
-NoteGeneration(freq, note_durations, alpha);
+song = NoteGeneration(freq, note_durations, alpha);
+
+% play the song
+player = audioplayer(song,FS);
+play(player,FS);
 %%
 %you can comment Questions you don`t need for a faster simulation
 % Question.3.1.1
@@ -544,26 +548,26 @@ function freqss = NoteFrequency(note)
 end
 
 % generate the notes
-function NoteGeneration(freq, duration, alpha)
+function songs = NoteGeneration(freq, duration, alpha)
     noteNum = length(freq);
     FS = 44100;
+    song = []; % the vector of output song
     %generating notes
     for i=1:noteNum
         N = floor(FS/freq(i)); % number of samples for each note
-        % *80 is just for making the music slower and more peaceful :)
-        outputLength = (N*duration(i)*80);
+        outputLength = (FS*duration(i)/1000);
         x = zeros(1,N);
         x(1,:) = randi([-1,1],1,N);
         x=[x zeros(1,outputLength-N)];
-
         y = zeros(1,outputLength); %output note
         y(1:N) = x(1,1:N);
         % transfer function
         a=[1 zeros(1,N-1) -alpha/2 -alpha/2];  %denominator 
         b=1;  %numerator 
         y = filter(b,a,x); %output
-        sound(y,FS) % use to play the note
+        song = [song y];
     end
+    songs = song;
 end
 
 % Question 3.1.1 - Laplace Transform
