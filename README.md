@@ -1,6 +1,6 @@
 # Signals-Systems_Sharif_HW
 
-#HW1:
+##HW1:
   * 1 - WorldWire
   * 2,1 & 2,2 - Z transform and inverse Z transform
   * 2,3 - analyzing systems with their block diagram
