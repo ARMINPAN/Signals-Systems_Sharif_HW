@@ -1,11 +1,11 @@
 %Question.1.2
-% introduction to an edge detection algorithm for digital pictures called
+% introduction to an edge detection algorithm for digital images called
 % Soble - Feldman which is a first order method
  
 clear; clc;
 
 %Question.1.1.2
-% load the picture
+% load the image
 pic1 = imread('NY_Q.1.2.jpg');
 %imshow(pic1);
 % define the kernels
@@ -19,5 +19,5 @@ Gy = conv2(kernel_2, rgb2gray(pic1));
 
 G = sqrt(Gx.^2 + Gy.^2);
 
-% normalize and print the picture
+% normalize and print the image
 imshow(G/max(G(:)));
