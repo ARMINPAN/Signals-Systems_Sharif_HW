@@ -25,7 +25,20 @@ imshow(output_image);
 %% 
 % Question.1.3.5
 % Image segmentation using otsu algorithm
-
+clc;
+clear;
+input=imread('Q1_3_Potter.jpg');
+input=rgb2gray(input); % make the image gray scale
+imhist(input); % plot the histogram
+values = imhist(input); % save values of histogram
+figure;
+graythresh(input)
+subplot(1,2,1);
+imshow(otsu(input,values));
+title('binarized image');
+subplot(1,2,2);
+imshow(imread('Q1_3_Potter.jpg'));
+title('orignal image');
 
 %% functions
 % Question.1.3.3 - K-means algorithm
@@ -98,10 +111,40 @@ function updatedPic = updatePixels(labels, imageData, centroids)
 end
 
 function updated = updateCentroids(labels, input_image, j)
+
     label = find(labels == j);
     updated = [floor(mean(input_image(label,1))), floor(mean(input_image(label,2))), floor(mean(input_image(label,3)))];
 end
 
 
 % Question.1.3.5 - otsu-algorithm
+function segmentedIm = otsu(input_image,hist)
+    % at first we have to find the threshold 
 
+    bClassVar_vector = []; % a vector to save all variances
+    
+    for i=1:length(hist)-1
+        
+        prob1 = sum(hist(1:i)./sum(hist)); % probability of cluster 1
+        prob2 = sum(hist(i+1:length(hist))./sum(hist)); % probability of cluster 2
+        
+        meanCluster1 = meanCalculator(hist(1:i),prob1,hist,(1:i)); % mean of first cluster 
+        meanCluster2 = meanCalculator(hist(i+1:length(hist)),prob2,hist,(i+1:length(hist))); % mean of the second cluster
+        
+        bClassVar = prob1*(1-prob1)*(meanCluster1-meanCluster2)^2;  % weighted between-class variance  
+        
+        bClassVar_vector = [bClassVar_vector bClassVar]; % add the new variance
+    end
+
+     thresh = find(bClassVar_vector == max(bClassVar_vector)); % finall threshold
+     segmentedIm = imbinarize(input_image,thresh(1)/256); % binarize the image with the threshold
+    
+end
+
+function mean = meanCalculator(input_vec,prob,hist,j)
+    meanOfVector = 0;
+    for i=1:length(input_vec)
+        meanOfVector = meanOfVector + (j(i))*hist(j(i))/sum(hist);
+    end
+    mean = meanOfVector/prob;
+end
