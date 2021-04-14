@@ -2,8 +2,8 @@
 
 clc;
 clear;
-thresh = 0.4; % example
-peopleDetector = vision.PeopleDetector('UprightPeople_128x64','ClassificationThreshold',thresh);
+thresh = 1; % example
+peopleDetector = vision.PeopleDetector('UprightPeople_96x48','ClassificationThreshold',thresh);
 I = imread('Q1_4_TAs.jpg');
 [bboxes,scores] = peopleDetector(I);
 I = insertObjectAnnotation(I,'rectangle',bboxes,scores);

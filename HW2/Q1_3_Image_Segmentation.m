@@ -32,7 +32,7 @@ input=rgb2gray(input); % make the image gray scale
 imhist(input); % plot the histogram
 values = imhist(input); % save values of histogram
 figure;
-graythresh(input)
+% graythresh(input)
 subplot(1,2,1);
 imshow(otsu(input,values));
 title('binarized image');
