@@ -2,7 +2,7 @@
 % detect people on a crosswalk video
 
 clc; clear;
-v=VideoReader('crossWalkSelectedFrames.avi') % just 30 frames of the original file
+v=VideoReader('crossWalkSelectedFrames.avi') % just 30 frames of the orginal file
 t=0;
 
 while hasFrame(v)
