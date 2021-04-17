@@ -48,8 +48,9 @@ Ptask = 1/length(rests)*sum(tasks(:,:).^2,1);
 channel_title = {'FP1','FP2','F7','F3','FZ','F4','F8','T7','C3','CZ','C4','T8','P7','P3','PZ','P4','P8','O1','O2'};
 
 figure;
-plot_topography(channel_title,Prest,1,'10-20'); % rest state
+% use min for a better plot
+plot_topography(channel_title,min(Prest,0.25),1,'10-20',1,1,1000); % rest state
 title('topography of resting state');
 figure;
-plot_topography(channel_title,Ptask,1); % task state
+plot_topography(channel_title,min(Ptask,0.48),1,'10-20',1,1,1000); % task state
 title('topography of task state');
