@@ -2,10 +2,12 @@
 % detect people on a crosswalk video
 
 clc; clear;
-v=VideoReader('crosswalk.mp4');
+v=VideoReader('crosswalk.webm')
 t=0;
 rng('default');
-selectedFrames = randperm(225,30); % use just 30 frames
+selectedFrames = randperm(v.NumFrames,30); % use just 30 frames
+
+
 while hasFrame(v)
     filename = 'saved_gif.gif';
     I = readFrame(v);
@@ -28,7 +30,7 @@ end
 
 function I = detect(frame)
 
-    thresh = 1.7; % example
+    thresh = 1.6; % example
     peopleDetector = vision.PeopleDetector('UprightPeople_96x48','ClassificationThreshold',thresh);
     I = frame;
     [bboxes,scores] = peopleDetector(I);
