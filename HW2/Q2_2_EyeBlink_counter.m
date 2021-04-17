@@ -23,8 +23,13 @@ end
 
 subplot(2,1,1);
 plot(eyeData);
+title('FP1 channel data');
+xlabel('time');
 subplot(2,1,2);
 plot(eyeData);
 hold on;
 line([blinkTime;blinkTime],[zeros(size(blinkTime));eyeData(blinkTime)],'Color','red');
 scatter([blinkTime],[eyeData(blinkTime)],'filled');
+title('time of blinkings');
+xlabel('time');
+
