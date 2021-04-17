@@ -6,11 +6,10 @@ clear; clc;
 % load the picture
 pic1 = imread('Bird_Q.1.1.jpg');
 
-% RGB split
+% RGB split - we could do with imsplit function too
 redChannel = pic1(:,:,1);
 greenChannel = pic1(:,:,2);
 blueChannel = pic1(:,:,3);
-
 
 % image and three splited channels
 subplot(2,2,1);
@@ -29,10 +28,10 @@ title('green Channel','interpreter','latex');
 
 %Question.1.1.2
 figure;
-sum = blueChannel + redChannel + greenChannel;
+sum = (blueChannel + redChannel + greenChannel);
 subplot(1,2,1);
 imshow(sum);
-title('sum of RGB channels','interpreter','latex');
+title('mean of sum of RGB channels','interpreter','latex');
 subplot(1,2,2);
 imshow(rgb2gray(pic1));
 title('RGB to Gray using rgb2gray','interpreter','latex');
@@ -42,5 +41,6 @@ title('RGB to Gray using rgb2gray','interpreter','latex');
 figure;
 binarypic1 = imbinarize(rgb2gray(pic1));
 imshowpair(pic1,binarypic1,'montage');
+title('binarized image');
 
 
