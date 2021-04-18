@@ -1,4 +1,4 @@
-# Signals-Systems_Sharif_HW
+C# Signals-Systems_Sharif_HW
 
 **HW1:**
   * 1 - WorldWire
@@ -19,4 +19,4 @@ This homework contains image processing and EEG
   * 1,4 - Object detection in image/video
 > EEG signals
   * 2,1 - Topography and power of channels
-  * 2,2 - Eye blink using FP1 channel data
+  * 2,2 - Count Eye blinks using FP1 channel data
