@@ -28,9 +28,9 @@ title('green Channel','interpreter','latex');
 
 %Question.1.1.2
 figure;
-sum = (blueChannel + redChannel + greenChannel);
 subplot(1,2,1);
-imshow(sum);
+summ = (cast(blueChannel,'double') + cast(redChannel,'double') + cast(greenChannel,'double'));
+imshow(cast(summ./3,'uint8'));
 title('mean of sum of RGB channels','interpreter','latex');
 subplot(1,2,2);
 imshow(rgb2gray(pic1));
