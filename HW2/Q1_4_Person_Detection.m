@@ -9,3 +9,4 @@ I = imread('Q1_4_TAs.jpg');
 I = insertObjectAnnotation(I,'rectangle',bboxes,scores);
 figure;
 imshow(I);
+title('Teacher Assistants');
