@@ -16,10 +16,11 @@ blinkTime = []; % a vector to save times of blinkings
 for i=1:(length(eyeData)/windowLength)
     [maximum, index] = max(eyeData((i-1)*windowLength+1:i*windowLength));
     if(maximum > 2.5) % condition of blinking is if the maximum data in a window is more than 2.5
-        blinkNum = blinkNum + 1
+        blinkNum = blinkNum + 1;
         blinkTime = [blinkTime, index+(i-1)*500];
     end
 end
+blinkNum % show number of blinks
 
 subplot(2,1,1);
 plot(eyeData);
