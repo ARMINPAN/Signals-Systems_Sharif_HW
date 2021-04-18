@@ -10,18 +10,18 @@ clc; clear;
 input_image = imread('Q1_3_flower.jpg');
 
 % segmentation
-% L = imsegkmeans(input_image,4);
-% B = labeloverlay(input_image,L);
 sizePic = size(input_image);
 k = 4; % k is number of centroids
 % generate random centroids 
-x = randi(sizePic(1),1, k);
-y = randi(sizePic(2),1, k);
+x = randi(sizePic(1),1, k)
+y = randi(sizePic(2),1, k)
 output_image = cluster(input_image, x, y, k); % x and y are initialized cluster centers.
 subplot(1,2,1);
 imshow(input_image);
+title('orginal image');
 subplot(1,2,2);
 imshow(output_image);
+title('image segmentation');
 %% 
 % Question.1.3.5
 % Image segmentation using otsu algorithm
@@ -30,12 +30,14 @@ clear;
 input=imread('Q1_3_Potter.jpg');
 input=rgb2gray(input); % make the image gray scale
 imhist(input); % plot the histogram
+title('histogram of the intensities');
 values = imhist(input); % save values of histogram
+[thresh, outIm] = otsu(input,values);
+line([thresh,thresh],[0,max(values)],'Color','red','LineStyle','--','LineWidth',2); % line of threshold
 figure;
-% graythresh(input)
 subplot(1,2,1);
-imshow(otsu(input,values));
-title('binarized image');
+imshow(outIm);
+title('image segmentation using otsu`s method');
 subplot(1,2,2);
 imshow(imread('Q1_3_Potter.jpg'));
 title('orignal image');
@@ -118,7 +120,7 @@ end
 
 
 % Question.1.3.5 - otsu-algorithm
-function segmentedIm = otsu(input_image,hist)
+function [thresh, segmentedIm] = otsu(input_image,hist)
     % at first we have to find the threshold 
 
     bClassVar_vector = []; % a vector to save all variances
