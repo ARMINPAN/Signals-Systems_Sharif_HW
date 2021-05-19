@@ -1,8 +1,17 @@
 % audio signal processing
 % question.1
+%% part 1 - DTMF
+%  import the filters in workspace at first to run code
+clc; clear;
+load('BP_697.mat');
+load('BP_770.mat');
+load('BP_852.mat');
+load('BP_941.mat');
+load('BP_1209.mat'); 
+load('BP_1336.mat'); 
+load('BP_1477.mat'); 
+load('BP_1633.mat'); 
 
-%% part 1
-% you should import the filters in workspace at first to run code
 
 clc;
 % for other recorded signals change the input of audioread:
@@ -15,14 +24,14 @@ clc;
 [audio, Fs1] = audioread('DialedSequence_NoNoise.wav');
 
 % apply the filters
-bp697 = conv(BP_697.Numerator, audio);
-bp770 = conv(BP_770.Numerator, audio);
-bp852 = conv(BP_852.Numerator, audio);
-bp941 = conv(BP_941.Numerator, audio);
-bp1209 = conv(BP_1209.Numerator, audio);
-bp1336 = conv(BP_1336.Numerator, audio);
-bp1477 = conv(BP_1477.Numerator, audio);
-bp1633 = conv(BP_1633.Numerator, audio);
+bp697 = conv(BP_697, audio);
+bp770 = conv(BP_770, audio);
+bp852 = conv(BP_852, audio);
+bp941 = conv(BP_941, audio);
+bp1209 = conv(BP_1209, audio);
+bp1336 = conv(BP_1336, audio);
+bp1477 = conv(BP_1477, audio);
+bp1633 = conv(BP_1633, audio);
 
 Filtered_signal = bp697+bp770+bp852+bp941+bp1209+bp1336+bp1477+bp1633;
 
@@ -81,39 +90,108 @@ Order = sort([one_pressed, two_pressed, three_pressed, A_pressed, ...
     hashtag_pressed, D_pressed]);
 
 % print the decoded data
+decoded = [];
 for i=1:length(Order)
     if Order(i) == one_pressed 
         fprintf("1");
+        decoded = [decoded, '1'];
     elseif Order(i) == two_pressed 
         fprintf("2");
+        decoded = [decoded, '2'];
     elseif Order(i) == three_pressed 
         fprintf("3");
+        decoded = [decoded, '3'];
     elseif Order(i) == A_pressed 
         fprintf("A");
+        decoded = [decoded, 'A'];
     elseif Order(i) == four_pressed 
         fprintf("4");
+        decoded = [decoded, '4'];
     elseif Order(i) == five_pressed 
         fprintf("5");
+        decoded = [decoded, '5'];
     elseif Order(i) == six_pressed 
         fprintf("6");
+        decoded = [decoded, '6'];
     elseif Order(i) == B_pressed 
         fprintf("B");
+        decoded = [decoded, 'B'];
     elseif Order(i) == seven_pressed 
         fprintf("7");
+        decoded = [decoded, '7'];
     elseif Order(i) == eight_pressed 
         fprintf("8");
+        decoded = [decoded, '8'];
     elseif Order(i) == nine_pressed 
         fprintf("9");
+        decoded = [decoded, '9'];
     elseif Order(i) == C_pressed 
         fprintf("C");
+        decoded = [decoded, 'C'];
     elseif Order(i) == star_pressed 
         fprintf("*");
+        decoded = [decoded, '*'];
     elseif Order(i) == zero_pressed 
         fprintf("0");
+        decoded = [decoded, '0'];
     elseif Order(i) == hashtag_pressed 
         fprintf("#");
+        decoded = [decoded, '#'];
     elseif Order(i) == D_pressed 
         fprintf("D");
+        decoded = [decoded, 'D'];
     end
     
 end
+
+% part 2 - a GUI for decoded keys using attached - visualized dial
+
+ShowDecodedKeys(decoded);
+
+function ShowDecodedKeys(input)
+keys = {}; % output image
+
+for i=1:length(input)
+    if(input(i) == '1')
+        keys{end+1} =  imread('1.bmp');
+    elseif(input(i) == '2')
+        keys{end+1} = imread('2.bmp');
+    elseif(input(i) == '3')
+        keys{end+1} = imread('3.bmp');
+    elseif(input(i) == 'A')
+        keys{end+1} = imread('A.bmp');    
+    elseif(input(i) == '4')
+        keys{end+1} =  imread('4.bmp');   
+    elseif(input(i) == '5')
+        keys{end+1} = imread('5.bmp');   
+    elseif(input(i) == '6')
+       keys{end+1} = imread('6.bmp');   
+    elseif(input(i) == 'B')
+        keys{end+1} =  imread('B.bmp');   
+    elseif(input(i) == '7')
+        keys{end+1} = imread('7.bmp');       
+    elseif(input(i) == '8')
+        keys{end+1} = imread('8.bmp');  
+    elseif(input(i) == '9')
+        keys{end+1} = imread('9.bmp');   
+    elseif(input(i) == 'C')
+        keys{end+1} = imread('C.bmp');  
+    elseif(input(i) == '*')
+        keys{end+1} = imread('asterisco.bmp');  
+    elseif(input(i) == '0')
+        keys{end+1} = imread('0.bmp'); 
+    elseif(input(i) == '#')
+        keys{end+1} = imread('cancelletto.bmp');
+    elseif(input(i) == 'D')
+        keys{end+1} = imread('D.bmp');
+    end
+end
+
+figure;
+montage(keys,'Size',[1 length(input)]);
+title('Visualized Dials','interpreter','latex');
+end
+
+
+
+
