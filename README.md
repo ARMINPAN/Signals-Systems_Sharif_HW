@@ -1,4 +1,4 @@
-C# Signals-Systems_Sharif_HW
+# Signals-Systems_Sharif_HW
 
 **HW1:**
   * 1 - WorldWire
@@ -20,3 +20,13 @@ This homework contains image processing and EEG
 > EEG signals
   * 2,1 - Topography and power of channels
   * 2,2 - Count Eye blinks using FP1 channel data
+
+  **HW3:**
+This homework contains audio signal processing
+> DTMF
+  * 1,1 - DTMF decoder
+  * 1,2 - Visualized output
+  * 1,3 - DTMF encoder
+> AM modulation
+  * 2,1&2 - plots, FFT
+  * 2,3 - AM demodulation
