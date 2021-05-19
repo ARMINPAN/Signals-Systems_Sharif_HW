@@ -51,7 +51,9 @@ ylabel('Amplitude','interpreter','latex');
 % if the signal is more than the threshold in any time, we relize that a
 % key is pressed
 % by looking at the smoothed plots we realize that C = 0.15 is a good
-% threshold 
+% threshold for the no noise signal
+% for any other signals you may need to change the threshold to get the
+% correct output
 
 bp697_pressed = find(bp697 > 0.15);
 bp770_pressed = find(bp770 > 0.15);
@@ -148,6 +150,98 @@ end
 
 ShowDecodedKeys(decoded);
 
+
+%%
+% part 3 - create sound of pressed dialing keys
+% each key will be pressed 0.2s with fs = 8192Hz
+
+clc; clear;
+input_keys = '1234567890*#ABCD'; % a char array which contains the pressed keys
+output_signal = [];
+
+% frequencies
+f1 = 697;
+f2 = 770;
+f3 = 852;
+f4 = 941;
+f5 = 1209;
+f6 = 1336;
+f7 = 1477;
+f8 = 1633;
+fs = 8192;
+time_pressed = 0.3;
+
+% song creater
+for i=1:length(input_keys)
+    if(input_keys(i) == '1')
+        output_signal = [output_signal sin(2*pi*f1.*[((i-1).*time_pressed*fs)+1:(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f5.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)];
+    elseif(input_keys(i) == '2')
+        output_signal = [output_signal sin(2*pi*f1.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f6.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)];
+    elseif(input_keys(i) == '3')
+        output_signal = [output_signal sin(2*pi*f1.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f7.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)];
+    elseif(input_keys(i) == 'A')
+        output_signal = [output_signal sin(2*pi*f1.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f8.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)];   
+    elseif(input_keys(i) == '4')
+        output_signal = [output_signal sin(2*pi*f2.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f5.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)];
+    elseif(input_keys(i) == '5')
+        output_signal = [output_signal sin(2*pi*f2.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f6.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)]; 
+    elseif(input_keys(i) == '6')
+        output_signal = [output_signal sin(2*pi*f2.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f7.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)];  
+    elseif(input_keys(i) == 'B')
+        output_signal = [output_signal sin(2*pi*f2.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f8.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)])];  
+    elseif(input_keys(i) == '7')
+        output_signal = [output_signal sin(2*pi*f3.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f5.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)];    
+    elseif(input_keys(i) == '8')
+        output_signal = [output_signal sin(2*pi*f3.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f6.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)]; 
+    elseif(input_keys(i) == '9')
+        output_signal = [output_signal sin(2*pi*f3.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f7.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)];    
+    elseif(input_keys(i) == 'C')
+        output_signal = [output_signal sin(2*pi*f3.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f8.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)];  
+    elseif(input_keys(i) == '*')
+        output_signal = [output_signal sin(2*pi*f4.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f5.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)];  
+    elseif(input_keys(i) == '0')
+        output_signal = [output_signal sin(2*pi*f4.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f6.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)]; 
+    elseif(input_keys(i) == '#')
+        output_signal = [output_signal sin(2*pi*f4.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f7.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)];   
+    elseif(input_keys(i) == 'D')
+        output_signal = [output_signal sin(2*pi*f4.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)+...
+            sin(2*pi*f8.*[((i-1).*time_pressed*fs+1):(i.*time_pressed*fs)]./fs)];  
+    end
+    % put some space between key presses
+    output_signal = [output_signal zeros(1,floor(time_pressed/2*fs))];
+end
+
+
+sound(output_signal);
+audiowrite('output_dialing.wav',output_signal,fs);
+figure
+X = output_signal;
+L = length(X);
+Y = fft(X);
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+f = fs*(0:(L/2))/L;
+plot(f,P1);
+
+%% functions
+
+% part 2
 function ShowDecodedKeys(input)
 keys = {}; % output image
 
@@ -191,7 +285,4 @@ figure;
 montage(keys,'Size',[1 length(input)]);
 title('Visualized Dials','interpreter','latex');
 end
-
-
-
 
