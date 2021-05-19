@@ -35,6 +35,7 @@ bp1633 = conv(BP_1633, audio);
 
 Filtered_signal = bp697+bp770+bp852+bp941+bp1209+bp1336+bp1477+bp1633;
 
+figure;
 subplot(2,1,1);
 plot(audio);
 title('Original Signal','interpreter','latex');
@@ -52,6 +53,7 @@ ylabel('Amplitude','interpreter','latex');
 % key is pressed
 % by looking at the smoothed plots we realize that C = 0.15 is a good
 % threshold for the no noise signal
+
 % for any other signals you may need to change the threshold to get the
 % correct output
 
@@ -227,17 +229,8 @@ for i=1:length(input_keys)
 end
 
 
-sound(output_signal);
-audiowrite('output_dialing.wav',output_signal,fs);
-figure
-X = output_signal;
-L = length(X);
-Y = fft(X);
-P2 = abs(Y/L);
-P1 = P2(1:L/2+1);
-P1(2:end-1) = 2*P1(2:end-1);
-f = fs*(0:(L/2))/L;
-plot(f,P1);
+sound(output_signal); % play the audio
+audiowrite('output_dialing.wav',output_signal,fs); % save the audio
 
 %% functions
 
