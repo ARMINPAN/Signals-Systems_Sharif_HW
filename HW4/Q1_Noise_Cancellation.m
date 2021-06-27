@@ -1,6 +1,10 @@
 % Q.1 - image noise cancellation
 % Salt&Pepper(SP)-GaussianNoise(G)-PoissonNoise(P)-SpeckleNoise(S)
-clc; clear;
+
+% the image i`ve used is a bit large and the code takes a little time to run be patient please :) or 
+% you can import a smaller photo for testing
+
+
 % now each time we add these 4 noises on an image and see the result
 image = imread('breakingbad.jfif');
 
@@ -18,26 +22,80 @@ title('Poisson Noise added');
 subplot(2,2,4),imshow(Noisy_S_image);
 title('Speckle Noise added');
 
+% gaussian filter on 4 images
+figure;
+% 1 - Sp
+filteredImage = gaussianFilter(3,Noisy_Sp_image,0.84);
+subplot(1,2,1),imshow(Noisy_Sp_image);
+title('Salt&Pepper Noise added');
+subplot(1,2,2),imshow(filteredImage);
+title('Filtered by Gaussian Filter');
+% 2 - G
+figure;
+filteredImage = gaussianFilter(3,Noisy_G_image,0.84);
+subplot(1,2,1),imshow(Noisy_G_image);
+title('Gaussian Noise added');
+subplot(1,2,2),imshow(filteredImage);
+title('Filtered by Gaussian Filter');
+% 3 - P
+figure;
+filteredImage = gaussianFilter(3,Noisy_P_image,0.84);
+subplot(1,2,1),imshow(Noisy_P_image);
+title('Poisson Noise added');
+subplot(1,2,2),imshow(filteredImage);
+title('Filtered by Gaussian Filter');
+% 4 - S
+figure;
+filteredImage = gaussianFilter(3,Noisy_S_image,0.84);
+subplot(1,2,1),imshow(Noisy_S_image);
+title('Poisson Noise added');
+subplot(1,2,2),imshow(filteredImage);
+title('Filtered by Gaussian Filter');
+
 % median filter
+% 1 - Sp
 filteredImage = medianFilter(3,Noisy_Sp_image);
 figure;
 subplot(1,2,1),imshow(Noisy_Sp_image);
 title('Salt&Pepper Noise added');
 subplot(1,2,2),imshow(filteredImage);
 title('Filtered by Median Filter');
+% 2 - G
+filteredImage = medianFilter(3,Noisy_G_image);
+figure;
+subplot(1,2,1),imshow(Noisy_G_image);
+title('Gaussian Noise added');
+subplot(1,2,2),imshow(filteredImage);
+title('Filtered by Median Filter');
+% 3 - P
+filteredImage = medianFilter(3,Noisy_P_image);
+figure;
+subplot(1,2,1),imshow(Noisy_P_image);
+title('Poisson Noise added');
+subplot(1,2,2),imshow(filteredImage);
+title('Filtered by Median Filter');
+% 4 - S
+filteredImage = medianFilter(3,Noisy_S_image);
+figure;
+subplot(1,2,1),imshow(Noisy_S_image);
+title('Speckle Noise added');
+subplot(1,2,2),imshow(filteredImage);
+title('Filtered by Median Filter');
+
 %% functions
 % median filter
 function outputimage = medianFilter(kernelSize,inputImage)
     % at first zeros must be padded around the image
-    zeroPadded_Image = zeros(2400+(kernelSize-1),3600+(kernelSize-1),3);
+    imageSize = size(inputImage);
+    zeroPadded_Image = zeros(imageSize(1)+(kernelSize-1),imageSize(2)+(kernelSize-1),3);
     zeroPadded_Image(:,:,1) = padarray(inputImage(:,:,1),[(kernelSize-1)/2 (kernelSize-1)/2],'both');
     zeroPadded_Image(:,:,2) = padarray(inputImage(:,:,2),[(kernelSize-1)/2 (kernelSize-1)/2],'both');
     zeroPadded_Image(:,:,3) = padarray(inputImage(:,:,3),[(kernelSize-1)/2 (kernelSize-1)/2],'both');
     zeroPaded_Image = uint8(zeroPadded_Image);
     filteredImage = zeroPadded_Image;
     % moving window on 3 RGB channels
-    for i=(1+(kernelSize-1)/2):(2400+(kernelSize-1)/2)
-       for j=(1+(kernelSize-1)/2):(3600+(kernelSize-1)/2)
+    for i=(1+(kernelSize-1)/2):(imageSize(1)+(kernelSize-1)/2)
+       for j=(1+(kernelSize-1)/2):(imageSize(2)+(kernelSize-1)/2)
            % red channel
            window = zeroPadded_Image((i-(kernelSize-1)/2):(i+(kernelSize-1)/2),...
                (j-(kernelSize-1)/2):(j+(kernelSize-1)/2),1);
@@ -55,5 +113,41 @@ function outputimage = medianFilter(kernelSize,inputImage)
            filteredImage(i,j,3) = vectorizedSortedWindow(1,(kernelSize*kernelSize+1)/2);
        end
     end
-    outputimage = uint8(filteredImage((1+(kernelSize-1)/2):(2400+(kernelSize-1)/2),(1+(kernelSize-1)/2):(3600+(kernelSize-1)/2),:));
+    outputimage = uint8(filteredImage((1+(kernelSize-1)/2):(imageSize(1)+(kernelSize-1)/2),(1+(kernelSize-1)/2):(imageSize(2)+(kernelSize-1)/2),:));
 end
+
+% gaussian filter
+function outputimage = gaussianFilter(kernelSize,inputImage,stdD)
+    imageSize = size(inputImage);
+    variance = stdD^2;
+    % kernel
+    kernel = zeros(kernelSize,kernelSize);
+    for i=1:kernelSize
+        for j=1:kernelSize
+            kernel(i,j) = 1/(2*pi*variance)*exp(-((i-(kernelSize+1)/2)^2+(j-(kernelSize+1)/2)^2)/(2*variance));
+        end
+    end
+    % zero padding
+    zeroPadded_Image = zeros(imageSize(1)+(kernelSize-1),imageSize(2)+(kernelSize-1),3);
+    zeroPadded_Image(:,:,1) = padarray(inputImage(:,:,1),[(kernelSize-1)/2 (kernelSize-1)/2],'both');
+    zeroPadded_Image(:,:,2) = padarray(inputImage(:,:,2),[(kernelSize-1)/2 (kernelSize-1)/2],'both');
+    zeroPadded_Image(:,:,3) = padarray(inputImage(:,:,3),[(kernelSize-1)/2 (kernelSize-1)/2],'both');
+    zeroPaded_Image = uint8(zeroPadded_Image);
+    filteredImage = zeroPadded_Image;
+        % moving window on 3 RGB channels
+    for i=(1+(kernelSize-1)/2):(imageSize(1)+(kernelSize-1)/2)
+       for j=(1+(kernelSize-1)/2):(imageSize(2)+(kernelSize-1)/2)
+          % red channel
+          filteredImage(i,j,1) = sum(kernel.*zeroPadded_Image((i-(kernelSize-1)/2):(i+(kernelSize-1)/2),...
+               (j-(kernelSize-1)/2):(j+(kernelSize-1)/2),1),'all');
+          % green channel
+          filteredImage(i,j,2) = sum(kernel.*zeroPadded_Image((i-(kernelSize-1)/2):(i+(kernelSize-1)/2),...
+               (j-(kernelSize-1)/2):(j+(kernelSize-1)/2),2),'all');
+           % blue channel
+          filteredImage(i,j,3) = sum(kernel.*zeroPadded_Image((i-(kernelSize-1)/2):(i+(kernelSize-1)/2),...
+               (j-(kernelSize-1)/2):(j+(kernelSize-1)/2),3),'all');
+       end
+    end
+    outputimage = uint8(filteredImage((1+(kernelSize-1)/2):(imageSize(1)+(kernelSize-1)/2),(1+(kernelSize-1)/2):(imageSize(2)+(kernelSize-1)/2),:));
+end
+    
