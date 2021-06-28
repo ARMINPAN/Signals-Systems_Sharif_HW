@@ -6,7 +6,7 @@
 
 
 % now each time we add these 4 noises on an image and see the result
-image = imread('breakingbad.jfif');
+image = imread('breakingbad.jpg');
 
 Noisy_Sp_image = imnoise(image,'salt & pepper');
 Noisy_G_image = imnoise(image,'gaussian');
@@ -25,62 +25,84 @@ title('Speckle Noise added');
 % gaussian filter on 4 images
 figure;
 % 1 - Sp
-filteredImage = gaussianFilter(3,Noisy_Sp_image,0.84);
+SpGaussianfilteredImage = gaussianFilter(7,Noisy_Sp_image,0.84);
 subplot(1,2,1),imshow(Noisy_Sp_image);
 title('Salt&Pepper Noise added');
-subplot(1,2,2),imshow(filteredImage);
+subplot(1,2,2),imshow(SpGaussianfilteredImage);
 title('Filtered by Gaussian Filter');
 % 2 - G
 figure;
-filteredImage = gaussianFilter(3,Noisy_G_image,0.84);
+gGaussianfilteredImage = gaussianFilter(7,Noisy_G_image,0.84);
 subplot(1,2,1),imshow(Noisy_G_image);
 title('Gaussian Noise added');
-subplot(1,2,2),imshow(filteredImage);
+subplot(1,2,2),imshow(gGaussianfilteredImage);
 title('Filtered by Gaussian Filter');
 % 3 - P
 figure;
-filteredImage = gaussianFilter(3,Noisy_P_image,0.84);
+pGaussianfilteredImage = gaussianFilter(7,Noisy_P_image,0.84);
 subplot(1,2,1),imshow(Noisy_P_image);
 title('Poisson Noise added');
-subplot(1,2,2),imshow(filteredImage);
+subplot(1,2,2),imshow(pGaussianfilteredImage);
 title('Filtered by Gaussian Filter');
 % 4 - S
 figure;
-filteredImage = gaussianFilter(3,Noisy_S_image,0.84);
+sGaussianfilteredImage = gaussianFilter(7,Noisy_S_image,0.84);
 subplot(1,2,1),imshow(Noisy_S_image);
-title('Poisson Noise added');
-subplot(1,2,2),imshow(filteredImage);
+title('Speckle Noise added');
+subplot(1,2,2),imshow(sGaussianfilteredImage);
 title('Filtered by Gaussian Filter');
 
 % median filter
 % 1 - Sp
-filteredImage = medianFilter(3,Noisy_Sp_image);
+SpMedianfilteredImage = medianFilter(3,Noisy_Sp_image);
 figure;
 subplot(1,2,1),imshow(Noisy_Sp_image);
 title('Salt&Pepper Noise added');
-subplot(1,2,2),imshow(filteredImage);
+subplot(1,2,2),imshow(SpMedianfilteredImage);
 title('Filtered by Median Filter');
 % 2 - G
-filteredImage = medianFilter(3,Noisy_G_image);
+gMedianfilteredImage = medianFilter(3,Noisy_G_image);
 figure;
 subplot(1,2,1),imshow(Noisy_G_image);
 title('Gaussian Noise added');
-subplot(1,2,2),imshow(filteredImage);
+subplot(1,2,2),imshow(gMedianfilteredImage);
 title('Filtered by Median Filter');
 % 3 - P
-filteredImage = medianFilter(3,Noisy_P_image);
+pMedianfilteredImage = medianFilter(3,Noisy_P_image);
 figure;
 subplot(1,2,1),imshow(Noisy_P_image);
 title('Poisson Noise added');
-subplot(1,2,2),imshow(filteredImage);
+subplot(1,2,2),imshow(pMedianfilteredImage);
 title('Filtered by Median Filter');
 % 4 - S
-filteredImage = medianFilter(3,Noisy_S_image);
+sMedianfilteredImage = medianFilter(3,Noisy_S_image);
 figure;
 subplot(1,2,1),imshow(Noisy_S_image);
 title('Speckle Noise added');
-subplot(1,2,2),imshow(filteredImage);
+subplot(1,2,2),imshow(sMedianfilteredImage);
 title('Filtered by Median Filter');
+
+
+% SNR of noisy images
+SpNoiseSNR = snrCalculator(image,Noisy_Sp_image)
+gNoiseSNR = snrCalculator(image,Noisy_G_image)
+pNoiseSNR = snrCalculator(image,Noisy_P_image)
+sNoiseSNR = snrCalculator(image,Noisy_S_image)
+
+% SNR of filtered images
+SpGaussianFilteredSNR = snrCalculator(image,SpGaussianfilteredImage)
+gGaussianFilteredSNR = snrCalculator(image,gGaussianfilteredImage)
+pGaussianFilteredSNR = snrCalculator(image,pGaussianfilteredImage)
+sGaussianFilteredSNR = snrCalculator(image, sGaussianfilteredImage)
+
+SpMedianFilteredSNR = snrCalculator(image,SpMedianfilteredImage)
+gMedianFilteredSNR = snrCalculator(image,gMedianfilteredImage)
+pMedianFilteredSNR = snrCalculator(image,pMedianfilteredImage)
+sMedianFilteredSNR = snrCalculator(image, sMedianfilteredImage)
+%%
+% Q.2 - modern noise cancellation methods
+
+
 
 %% functions
 % median filter
@@ -151,3 +173,12 @@ function outputimage = gaussianFilter(kernelSize,inputImage,stdD)
     outputimage = uint8(filteredImage((1+(kernelSize-1)/2):(imageSize(1)+(kernelSize-1)/2),(1+(kernelSize-1)/2):(imageSize(2)+(kernelSize-1)/2),:));
 end
     
+
+% SNR calculator
+function SNR = snrCalculator(orginalImage,secondImage)
+    % convert rgb to grayscale and impelement the SNR formula
+    SNR = 10*log10((sum((im2gray(orginalImage)).^2,'all'))/...
+        (sum((im2gray(orginalImage)-im2gray(secondImage)).^2,'all')));
+end
+
+
