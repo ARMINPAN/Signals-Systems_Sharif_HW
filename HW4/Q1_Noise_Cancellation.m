@@ -1,6 +1,6 @@
 % Q.1 - image noise cancellation
 % Salt&Pepper(SP)-GaussianNoise(G)-PoissonNoise(P)-SpeckleNoise(S)
-
+clear; clc;
 % the image i`ve used is a bit large and the code takes a little time to run be patient please :) or 
 % you can import a smaller photo for testing
 
@@ -101,7 +101,16 @@ pMedianFilteredSNR = snrCalculator(image,pMedianfilteredImage)
 sMedianFilteredSNR = snrCalculator(image, sMedianfilteredImage)
 %%
 % Q.2 - modern noise cancellation methods
+clc; clear;
+brainIm = imread('brain.jpg');
+brainIm = im2double(rgb2gray(brainIm));
+% add a gaussian noise to the image
+Noisy_G_image = imnoise(brainIm,'gaussian',0,0.05);
+figure;
+montage({brainIm,Noisy_G_image});
+title('grayscale and noisy brain image');
 
+% EPI - edge preserving index
 
 
 %% functions
@@ -149,27 +158,10 @@ function outputimage = gaussianFilter(kernelSize,inputImage,stdD)
             kernel(i,j) = 1/(2*pi*variance)*exp(-((i-(kernelSize+1)/2)^2+(j-(kernelSize+1)/2)^2)/(2*variance));
         end
     end
-    % zero padding
-    zeroPadded_Image = zeros(imageSize(1)+(kernelSize-1),imageSize(2)+(kernelSize-1),3);
-    zeroPadded_Image(:,:,1) = padarray(inputImage(:,:,1),[(kernelSize-1)/2 (kernelSize-1)/2],'both');
-    zeroPadded_Image(:,:,2) = padarray(inputImage(:,:,2),[(kernelSize-1)/2 (kernelSize-1)/2],'both');
-    zeroPadded_Image(:,:,3) = padarray(inputImage(:,:,3),[(kernelSize-1)/2 (kernelSize-1)/2],'both');
-    zeroPaded_Image = uint8(zeroPadded_Image);
-    filteredImage = zeroPadded_Image;
-        % moving window on 3 RGB channels
-    for i=(1+(kernelSize-1)/2):(imageSize(1)+(kernelSize-1)/2)
-       for j=(1+(kernelSize-1)/2):(imageSize(2)+(kernelSize-1)/2)
-          % red channel
-          filteredImage(i,j,1) = sum(kernel.*zeroPadded_Image((i-(kernelSize-1)/2):(i+(kernelSize-1)/2),...
-               (j-(kernelSize-1)/2):(j+(kernelSize-1)/2),1),'all');
-          % green channel
-          filteredImage(i,j,2) = sum(kernel.*zeroPadded_Image((i-(kernelSize-1)/2):(i+(kernelSize-1)/2),...
-               (j-(kernelSize-1)/2):(j+(kernelSize-1)/2),2),'all');
-           % blue channel
-          filteredImage(i,j,3) = sum(kernel.*zeroPadded_Image((i-(kernelSize-1)/2):(i+(kernelSize-1)/2),...
-               (j-(kernelSize-1)/2):(j+(kernelSize-1)/2),3),'all');
-       end
-    end
+    filteredImage = zeros(imageSize(1)+(kernelSize-1),imageSize(2)+(kernelSize-1),3);
+    filteredImage(:,:,1) = conv2(inputImage(:,:,1),kernel);
+    filteredImage(:,:,2) = conv2(inputImage(:,:,2),kernel);
+    filteredImage(:,:,3) = conv2(inputImage(:,:,3),kernel);
     outputimage = uint8(filteredImage((1+(kernelSize-1)/2):(imageSize(1)+(kernelSize-1)/2),(1+(kernelSize-1)/2):(imageSize(2)+(kernelSize-1)/2),:));
 end
     
@@ -181,4 +173,8 @@ function SNR = snrCalculator(orginalImage,secondImage)
         (sum((im2gray(orginalImage)-im2gray(secondImage)).^2,'all')));
 end
 
-
+% EPI calculator
+function epi = epiCalculator(orginalImage,filteredImage)
+% todo
+epi = 0;
+end
