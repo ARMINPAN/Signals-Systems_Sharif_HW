@@ -99,6 +99,7 @@ SpMedianFilteredSNR = snrCalculator(image,SpMedianfilteredImage)
 gMedianFilteredSNR = snrCalculator(image,gMedianfilteredImage)
 pMedianFilteredSNR = snrCalculator(image,pMedianfilteredImage)
 sMedianFilteredSNR = snrCalculator(image, sMedianfilteredImage)
+
 %%
 % Q.2 - modern noise cancellation methods
 clc; clear;
@@ -181,13 +182,27 @@ subplot(1,3,3),imshow((averageFilteredSize7));
 title('averagefilteredImage, kernel size = 7');
 
 % EPI - edge preserving index
-Epi_averageFilteredSize3 = epiCalculator(brainIm,im2double(averageFilteredSize3))
-Epi_gaverageFilteredSize5 = epiCalculator(brainIm,im2double(averageFilteredSize5))
-Epi_averageFilteredSize7 = epiCalculator(brainIm,im2double(averageFilteredSize7))
+Epi_averageFilteredSize3 = epiCalculator(brainIm,(averageFilteredSize3))
+Epi_gaverageFilteredSize5 = epiCalculator(brainIm,(averageFilteredSize5))
+Epi_averageFilteredSize7 = epiCalculator(brainIm,(averageFilteredSize7))
 % SNR 
-Snr_averageFilteredSize3 = snrCalculator(brainIm,im2double(averageFilteredSize3))
-Snr_averageFilteredSize5 = snrCalculator(brainIm,im2double(averageFilteredSize5))
-Snr_averageFilteredSize7 = snrCalculator(brainIm,im2double(averageFilteredSize7))
+Snr_averageFilteredSize3 = snrCalculator(brainIm,(averageFilteredSize3))
+Snr_averageFilteredSize5 = snrCalculator(brainIm,(averageFilteredSize5))
+Snr_averageFilteredSize7 = snrCalculator(brainIm,(averageFilteredSize7))
+
+% Bilateral Filtering
+NoiseSTDd = 0.05;
+bilateralFilteredImage = bilateralFilter(Noisy_G_image,NoiseSTDd);
+figure;
+subplot(1,2,1),imshow(Noisy_G_image);
+title('Noisy Image');
+subplot(1,2,2),imshow(bilateralFilteredImage);
+title('filtered by bilateral filter');
+
+% EPI - edge preserving index
+Epi_bilateralFiltered = epiCalculator(brainIm,(bilateralFilteredImage))
+% SNR 
+Snr_bilateralFiltered = snrCalculator(brainIm,(bilateralFilteredImage))
 
 %% functions
 % median filter
@@ -289,4 +304,36 @@ function filtered = averageFilter(kernelSize,inputImage)
     kernel = ones(kernelSize,kernelSize)./kernelSize^2;
     filter = (conv2(inputImage,kernel));
     filtered = filter((1+(kernelSize-1)/2):(imageSize(1)+(kernelSize-1)/2),(1+(kernelSize-1)/2):(imageSize(2)+(kernelSize-1)/2));
+end
+
+% bilateral filter
+function filtered = bilateralFilter(inputImage,noiseSTD)
+    inputImage = im2double(inputImage);
+    imageSize = size(inputImage);
+    filtered = inputImage;
+    % initialize the weight ghx
+    Ghx_kernel = zeros(3,3);
+    diagonalSizeIm = imageSize(1) * sqrt(2);
+    hx = 0.02 * diagonalSizeIm;
+    hg = 1.95 * noiseSTD;
+    for i=1:3
+        for j=1:3
+            Ghx_kernel(i,j) = exp(-1*((i-2)^2+(j-2)^2)/(2*hx^2));
+        end
+    end
+    % because we have medical image(MRI of brain) in our implementation, border pixels
+    % are ignored because usually they don`t have any specific data
+    for i=2:imageSize(1)-1
+        for j=2:imageSize(1)-1
+            Ghg_kernel = zeros(3,3);
+            % Ghg intensity weight
+            for k=-1:1
+                for l=-1:1
+                    Ghg_kernel(k+2,l+2) = exp(-1*((inputImage(i+k,j+l)-inputImage(i,j))^2)/(2*hg^2));
+                end
+            end
+            filtered(i,j) = sum(inputImage((i-1):(i+1),(j-1):(j+1)).*Ghx_kernel.*Ghg_kernel,'all')/...
+                sum(Ghx_kernel.*Ghg_kernel,'all');
+        end
+    end
 end
