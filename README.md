@@ -35,12 +35,12 @@ This homework contains audio signal processing
 This homework contains image processing
 > Noise Cancellation
 1. Salt&Pepper/Gaussian/Poisson/Speckle Noise
-2. Median Filter
-3. Gaussian Filter
-4. SNR Implementation
+2. Median Filter Implementation
+3. Gaussian Filter Implementation
+4. SNR Calculator 
 > Modern Noise Cancellation
-1. EPI Implementation
-2. Disk Filter
-3. Gaussian Filter
-4. Average Filter
-5. Bilateral Filter
+1. EPI Calculator
+2. Disk Filter Implementation
+3. Gaussian Filter Implementation
+4. Average Filter Implementation
+5. Bilateral Filter Implementation
