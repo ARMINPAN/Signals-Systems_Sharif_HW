@@ -1,13 +1,16 @@
-% Q.1 - image noise cancellation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q.1 - image noise cancellation
 % Salt&Pepper(SP)-GaussianNoise(G)-PoissonNoise(P)-SpeckleNoise(S)
 clear; clc;
+
 % the image i`ve used is a bit large and the code takes a little time to run be patient please :) or 
 % you can import a smaller photo for testing
 
 
 % now each time we add these 4 noises on an image and see the result
 image = imread('breakingbad.jpg');
-
+figure;
+imshow(image);
+title('original image');
 Noisy_Sp_image = imnoise(image,'salt & pepper');
 Noisy_G_image = imnoise(image,'gaussian');
 Noisy_P_image = imnoise(image,'poisson');
@@ -25,32 +28,32 @@ title('Speckle Noise added');
 % gaussian filter on 4 images
 figure;
 % 1 - Sp
-SpGaussianfilteredImage = gaussianFilter(7,Noisy_Sp_image,0.84);
+SpGaussianfilteredImage = gaussianFilter(13,Noisy_Sp_image,1.3);
 subplot(1,2,1),imshow(Noisy_Sp_image);
 title('Salt&Pepper Noise added');
 subplot(1,2,2),imshow(SpGaussianfilteredImage);
-title('Filtered by Gaussian Filter');
+title('Filtered by Gaussian Filter, kernelSize = 13, sigma = 1.3');
 % 2 - G
 figure;
 gGaussianfilteredImage = gaussianFilter(7,Noisy_G_image,0.84);
 subplot(1,2,1),imshow(Noisy_G_image);
 title('Gaussian Noise added');
 subplot(1,2,2),imshow(gGaussianfilteredImage);
-title('Filtered by Gaussian Filter');
+title('Filtered by Gaussian Filter, kernelSize = 7, sigma = 0.84');
 % 3 - P
 figure;
-pGaussianfilteredImage = gaussianFilter(7,Noisy_P_image,0.84);
+pGaussianfilteredImage = gaussianFilter(11,Noisy_P_image,1.1);
 subplot(1,2,1),imshow(Noisy_P_image);
 title('Poisson Noise added');
 subplot(1,2,2),imshow(pGaussianfilteredImage);
-title('Filtered by Gaussian Filter');
+title('Filtered by Gaussian Filter, kernelSize = 11, sigma = 1.1');
 % 4 - S
 figure;
-sGaussianfilteredImage = gaussianFilter(7,Noisy_S_image,0.84);
+sGaussianfilteredImage = gaussianFilter(15,Noisy_S_image,1.3);
 subplot(1,2,1),imshow(Noisy_S_image);
 title('Speckle Noise added');
 subplot(1,2,2),imshow(sGaussianfilteredImage);
-title('Filtered by Gaussian Filter');
+title('Filtered by Gaussian Filter, kernelSize = 15, sigma = 1.3');
 
 % median filter
 % 1 - Sp
@@ -59,28 +62,28 @@ figure;
 subplot(1,2,1),imshow(Noisy_Sp_image);
 title('Salt&Pepper Noise added');
 subplot(1,2,2),imshow(SpMedianfilteredImage);
-title('Filtered by Median Filter');
+title('Filtered by Median Filter, kernelSize = 3');
 % 2 - G
-gMedianfilteredImage = medianFilter(3,Noisy_G_image);
+gMedianfilteredImage = medianFilter(5,Noisy_G_image);
 figure;
 subplot(1,2,1),imshow(Noisy_G_image);
 title('Gaussian Noise added');
 subplot(1,2,2),imshow(gMedianfilteredImage);
-title('Filtered by Median Filter');
+title('Filtered by Median Filter, kernelSize = 5');
 % 3 - P
 pMedianfilteredImage = medianFilter(3,Noisy_P_image);
 figure;
 subplot(1,2,1),imshow(Noisy_P_image);
 title('Poisson Noise added');
 subplot(1,2,2),imshow(pMedianfilteredImage);
-title('Filtered by Median Filter');
+title('Filtered by Median Filter, kernelSize = 3');
 % 4 - S
-sMedianfilteredImage = medianFilter(3,Noisy_S_image);
+sMedianfilteredImage = medianFilter(7,Noisy_S_image);
 figure;
 subplot(1,2,1),imshow(Noisy_S_image);
 title('Speckle Noise added');
 subplot(1,2,2),imshow(sMedianfilteredImage);
-title('Filtered by Median Filter');
+title('Filtered by Median Filter, kernelSize = 7');
 
 
 % SNR of noisy images
@@ -101,7 +104,7 @@ pMedianFilteredSNR = snrCalculator(image,pMedianfilteredImage)
 sMedianFilteredSNR = snrCalculator(image, sMedianfilteredImage)
 
 %%
-% Q.2 - modern noise cancellation methods
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Q.2 - modern noise cancellation methods
 clc; clear;
 brainIm = imread('brain.jpg');
 brainIm = im2double(rgb2gray(brainIm));
@@ -115,6 +118,7 @@ title('grayscale and noisy brain image');
 lowBandWidthfilter = lowPassDiskFilter(62,length(Noisy_G_image));
 mediumBandWidthfilter = lowPassDiskFilter(123,length(Noisy_G_image));
 highBandWidthfilter = lowPassDiskFilter(246,length(Noisy_G_image));
+
 figure;
 subplot(1,3,1),imshow((lowBandWidthfilter));
 title('disk lowpass filter with radius 0.2');
@@ -183,7 +187,7 @@ title('averagefilteredImage, kernel size = 7');
 
 % EPI - edge preserving index
 Epi_averageFilteredSize3 = epiCalculator(brainIm,(averageFilteredSize3))
-Epi_gaverageFilteredSize5 = epiCalculator(brainIm,(averageFilteredSize5))
+Epi_averageFilteredSize5 = epiCalculator(brainIm,(averageFilteredSize5))
 Epi_averageFilteredSize7 = epiCalculator(brainIm,(averageFilteredSize7))
 % SNR 
 Snr_averageFilteredSize3 = snrCalculator(brainIm,(averageFilteredSize3))
@@ -300,6 +304,8 @@ end
 
 % average filter 
 function filtered = averageFilter(kernelSize,inputImage)
+    imageSize = size(inputImage);
+    filtered = zeros(imageSize(1)+(kernelSize-1),imageSize(2)+(kernelSize-1));
     imageSize = size(inputImage);
     kernel = ones(kernelSize,kernelSize)./kernelSize^2;
     filter = (conv2(inputImage,kernel));
