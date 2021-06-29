@@ -105,13 +105,89 @@ clc; clear;
 brainIm = imread('brain.jpg');
 brainIm = im2double(rgb2gray(brainIm));
 % add a gaussian noise to the image
-Noisy_G_image = imnoise(brainIm,'gaussian',0,0.05);
+Noisy_G_image = imnoise(brainIm,'gaussian',0,0.0025);
 figure;
 montage({brainIm,Noisy_G_image});
 title('grayscale and noisy brain image');
 
-% EPI - edge preserving index
+% ----------------- low pass disk filters
+lowBandWidthfilter = lowPassDiskFilter(62,length(Noisy_G_image));
+mediumBandWidthfilter = lowPassDiskFilter(123,length(Noisy_G_image));
+highBandWidthfilter = lowPassDiskFilter(246,length(Noisy_G_image));
+figure;
+subplot(1,3,1),imshow((lowBandWidthfilter));
+title('disk lowpass filter with radius 0.2');
+subplot(1,3,2),imshow((mediumBandWidthfilter));
+title('disk lowpass filter with radius 0.4');
+subplot(1,3,3),imshow((highBandWidthfilter));
+title('disk lowpass filter with radius 0.8');
 
+% apply these filters to the noisy image
+lowBandWidthFilteredImage = abs(ifft2(ifftshift(((fftshift(fft2(Noisy_G_image)).*(lowBandWidthfilter))))));
+mediumBandWidthFilteredImage = abs(ifft2(ifftshift(((fftshift(fft2(Noisy_G_image)).*(mediumBandWidthfilter))))));
+highBandWidthFilteredImage = abs(ifft2(ifftshift(((fftshift(fft2(Noisy_G_image)).*(highBandWidthfilter))))));
+figure;
+subplot(1,3,1),imshow((lowBandWidthFilteredImage));
+title('filteredImage with radius 0.2');
+subplot(1,3,2),imshow((mediumBandWidthFilteredImage));
+title('filteredImage with radius 0.4');
+subplot(1,3,3),imshow((highBandWidthFilteredImage));
+title('filteredImage with radius 0.8');
+
+% EPI - edge preserving index
+Epi_noisyIm = epiCalculator(brainIm,Noisy_G_image)
+Epi_lowBWdiskFilter = epiCalculator(brainIm,lowBandWidthFilteredImage)
+Epi_mediumBWdiskFilter = epiCalculator(brainIm,mediumBandWidthFilteredImage)
+Epi_highBWdiskFilter = epiCalculator(brainIm,highBandWidthFilteredImage)
+% SNR 
+Snr_noisyIm = snrCalculator(brainIm,Noisy_G_image)
+Snr_lowBWdiskFilter = snrCalculator(brainIm,lowBandWidthFilteredImage)
+Snr_mediumBWdiskFilter = snrCalculator(brainIm,mediumBandWidthFilteredImage)
+Snr_highBWdiskFilter = snrCalculator(brainIm,highBandWidthFilteredImage)
+
+% -------------- gaussian filtering
+gaussianFilteredImageLowVar = gaussianFilter(3,Noisy_G_image,0.4);
+gaussianFilteredImageMediumVar = gaussianFilter(3,Noisy_G_image,0.8);
+gaussianFilteredImageHighVar = gaussianFilter(3,Noisy_G_image,1.3);
+
+figure;
+subplot(1,3,1),imshow((gaussianFilteredImageLowVar));
+title('gaussianfilteredImage with variance 0.16');
+subplot(1,3,2),imshow((gaussianFilteredImageMediumVar));
+title('gaussianfilteredImage with variance 0.64');
+subplot(1,3,3),imshow((gaussianFilteredImageHighVar));
+title('gaussianfilteredImage with variance 1.69');
+
+% EPI - edge preserving index
+Epi_gaussianFilteredLowVar = epiCalculator(brainIm,im2double(gaussianFilteredImageLowVar))
+Epi_gaussianFilteredMediumVar = epiCalculator(brainIm,im2double(gaussianFilteredImageMediumVar))
+Epi_gaussianFilteredHighVar = epiCalculator(brainIm,im2double(gaussianFilteredImageHighVar))
+% SNR 
+Snr_gaussianFilteredLowVar = snrCalculator(brainIm,im2double(gaussianFilteredImageLowVar))
+Snr_gaussianFilteredMediumVar = snrCalculator(brainIm,im2double(gaussianFilteredImageMediumVar))
+Snr_gaussianFilteredHighVar = snrCalculator(brainIm,im2double(gaussianFilteredImageHighVar))
+
+% ---------------- average kernel
+averageFilteredSize3 = averageFilter(3,Noisy_G_image);
+averageFilteredSize5 = averageFilter(5,Noisy_G_image);
+averageFilteredSize7 = averageFilter(7,Noisy_G_image);
+
+figure;
+subplot(1,3,1),imshow((averageFilteredSize3));
+title('averagefilteredImage, kernel size = 3');
+subplot(1,3,2),imshow((averageFilteredSize5));
+title('averagefilteredImage, kernel size = 5');
+subplot(1,3,3),imshow((averageFilteredSize7));
+title('averagefilteredImage, kernel size = 7');
+
+% EPI - edge preserving index
+Epi_averageFilteredSize3 = epiCalculator(brainIm,im2double(averageFilteredSize3))
+Epi_gaverageFilteredSize5 = epiCalculator(brainIm,im2double(averageFilteredSize5))
+Epi_averageFilteredSize7 = epiCalculator(brainIm,im2double(averageFilteredSize7))
+% SNR 
+Snr_averageFilteredSize3 = snrCalculator(brainIm,im2double(averageFilteredSize3))
+Snr_averageFilteredSize5 = snrCalculator(brainIm,im2double(averageFilteredSize5))
+Snr_averageFilteredSize7 = snrCalculator(brainIm,im2double(averageFilteredSize7))
 
 %% functions
 % median filter
@@ -158,11 +234,18 @@ function outputimage = gaussianFilter(kernelSize,inputImage,stdD)
             kernel(i,j) = 1/(2*pi*variance)*exp(-((i-(kernelSize+1)/2)^2+(j-(kernelSize+1)/2)^2)/(2*variance));
         end
     end
-    filteredImage = zeros(imageSize(1)+(kernelSize-1),imageSize(2)+(kernelSize-1),3);
-    filteredImage(:,:,1) = conv2(inputImage(:,:,1),kernel);
-    filteredImage(:,:,2) = conv2(inputImage(:,:,2),kernel);
-    filteredImage(:,:,3) = conv2(inputImage(:,:,3),kernel);
-    outputimage = uint8(filteredImage((1+(kernelSize-1)/2):(imageSize(1)+(kernelSize-1)/2),(1+(kernelSize-1)/2):(imageSize(2)+(kernelSize-1)/2),:));
+    if(max(size(imageSize)) == 3) % rgb image
+        filteredImage = zeros(imageSize(1)+(kernelSize-1),imageSize(2)+(kernelSize-1),3);
+        filteredImage(:,:,1) = conv2(inputImage(:,:,1),kernel);
+        filteredImage(:,:,2) = conv2(inputImage(:,:,2),kernel);
+        filteredImage(:,:,3) = conv2(inputImage(:,:,3),kernel);
+        outputimage = uint8(filteredImage((1+(kernelSize-1)/2):(imageSize(1)+(kernelSize-1)/2),(1+(kernelSize-1)/2):(imageSize(2)+(kernelSize-1)/2),:));
+    end
+    if(max(size(imageSize)) == 2) % grayscale image
+        filteredImage = zeros(imageSize(1)+(kernelSize-1),imageSize(2)+(kernelSize-1));
+        filteredImage(:,:) = conv2(inputImage,kernel);
+        outputimage = filteredImage((1+(kernelSize-1)/2):(imageSize(1)+(kernelSize-1)/2),(1+(kernelSize-1)/2):(imageSize(2)+(kernelSize-1)/2));
+    end
 end
     
 
@@ -175,6 +258,35 @@ end
 
 % EPI calculator
 function epi = epiCalculator(orginalImage,filteredImage)
-% todo
-epi = 0;
+    kernel = fspecial('laplacian',0.2);
+    highP_orginalIm = conv2(orginalImage,kernel);
+    highP_filteredIm = conv2(filteredImage,kernel);
+    meanHighP_orginalIm = mean(highP_orginalIm(:));
+    meanHighP_filteredIm = mean(highP_filteredIm(:));
+    numerator = sum((highP_orginalIm-meanHighP_orginalIm).*...
+        (highP_filteredIm-meanHighP_filteredIm),'all');
+    denominator = sqrt((sum((highP_orginalIm-meanHighP_orginalIm).^2,'all'))*...
+        (sum((highP_filteredIm-meanHighP_filteredIm).^2,'all')));
+    epi = numerator/denominator;
+end
+
+% disk lowpas filter
+function filter = lowPassDiskFilter(bandwidth,imageSize)
+    filter = zeros(imageSize,imageSize);
+    for i=1:(imageSize)
+        for j=1:(imageSize)
+            if ((i-(imageSize+1)/2)^2+(j-(imageSize+1)/2)^2) < (bandwidth^2)
+                filter(i,j) = 1;
+            end
+        end
+    end
+end
+
+
+% average filter 
+function filtered = averageFilter(kernelSize,inputImage)
+    imageSize = size(inputImage);
+    kernel = ones(kernelSize,kernelSize)./kernelSize^2;
+    filter = (conv2(inputImage,kernel));
+    filtered = filter((1+(kernelSize-1)/2):(imageSize(1)+(kernelSize-1)/2),(1+(kernelSize-1)/2):(imageSize(2)+(kernelSize-1)/2));
 end
